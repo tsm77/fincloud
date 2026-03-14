@@ -1,0 +1,117 @@
+/* ocupa 100% e remove o "respiro" */
+.page {
+  min-height: 100vh;
+  display: flex;
+  background: #eef1f5;
+  padding: 0;          /* <<< tira espaço em volta */
+  gap: 0;              /* <<< tira espaço entre sidebar e content */
+}
+
+/* sidebar colada no topo/rodapé */
+.sidebar-card {
+  width: 280px;
+  height: 100vh;       /* <<< do topo ao final */
+  position: sticky;    /* fica “presa” ao rolar */
+  top: 0;
+
+  background: #fff;
+  border-radius: 0;    /* <<< tira cantos arredondados pra ficar "reta" */
+  box-shadow: none;    /* <<< opcional: sem sombra pra parecer sidebar */
+  border-right: 1px solid #e5e7eb;
+
+  padding: 22px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* mantém o menu empurrando o "Sair" para o final */
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;             /* <<< empurra o logout pra baixo */
+}
+
+/* conteúdo à direita */
+.content {
+  flex: 1;
+  min-width: 0;
+  padding: 32px;       /* <<< espaço só no conteúdo */
+}
+
+.brand {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0 18px;
+}
+
+.brand-logo {
+  width: 155px;
+  height: auto;
+}
+
+
+
+.menu-item {
+  border: 0;
+  width: 100%;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 12px 12px;
+  border-radius: 10px;
+
+  text-decoration: none;
+  background: transparent;
+  color: #334155; // slate
+  font-weight: 600;
+
+  transition: background 150ms ease, color 150ms ease, transform 100ms ease;
+}
+
+.menu-item i {
+  font-size: 1.05rem;
+  opacity: 0.9;
+}
+
+.menu-item:hover {
+  background: #f3f6fb;
+}
+
+.menu-item:active {
+  transform: translateY(1px);
+}
+
+/* Item ativo (faixa azul do print) */
+.menu-item.active {
+  background: linear-gradient(90deg, #1d4ed8 0%, #3b82f6 100%);
+  color: #fff;
+  position: relative;
+}
+
+/* “bar” vertical na esquerda do item ativo */
+.menu-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 5px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* Sair vermelho */
+.menu-item.danger {
+  margin-top: 10px;
+  color: #dc2626;
+  justify-content: flex-start;
+}
+
+.menu-item.danger:hover {
+  background: #fff1f2;
+}

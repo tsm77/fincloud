@@ -1,0 +1,8 @@
+:host ::ng-deep .p-floatlabel > label {
+  left: 0.75rem; /* alinha melhor com o inputgroup */
+}
+
+:host ::ng-deep .p-inputgroup .p-inputtext,
+:host ::ng-deep .p-inputgroup .p-password-input {
+  height: 44px;
+}

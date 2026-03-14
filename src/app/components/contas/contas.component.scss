@@ -1,0 +1,84 @@
+.account-card {
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 14px 0 14px;
+}
+
+.card-header .left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+}
+
+.title .name {
+  font-weight: 800;
+  font-size: 1rem;
+  color: #111827;
+}
+
+.title .type {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+.saldo {
+  padding: 10px 14px 14px 14px;
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: #059669;
+}
+
+.saldo.negativo {
+  color: #dc2626;
+}
+
+/* botão de "..." */
+.icon-btn {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 10px;
+}
+
+.icon-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+.contas-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.account-card {
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+}
+
+/* deixa os cards com altura parecida */
+.account-card :host ::ng-deep .p-card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+@media (max-width: 900px) {
+  .contas-grid {
+    grid-template-columns: 1fr;
+  }
+}

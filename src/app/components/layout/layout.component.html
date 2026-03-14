@@ -1,0 +1,31 @@
+<div class="page">
+  <!-- Sidebar card -->
+  <aside class="sidebar-card">
+    <div class="brand">
+      <img class="brand-logo" src="assets/fincloud.png" alt="FinCloud" />
+    </div>
+
+    <nav class="menu">
+      @for (item of menu; track item.label) {
+        <a
+          class="menu-item"
+          [routerLink]="item.link!"
+          routerLinkActive="active"
+        >
+          <i class="{{ item.icon }}"></i>
+          <span>{{ item.label }}</span>
+        </a>
+      }
+
+      <button class="menu-item danger" type="button" (click)="logout()">
+        <i class="pi pi-power-off"></i>
+        <span>Sair</span>
+      </button>
+    </nav>
+  </aside>
+
+  <!-- Content -->
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

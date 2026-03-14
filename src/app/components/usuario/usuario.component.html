@@ -1,0 +1,74 @@
+<form [formGroup]="formUsuario">
+  <div class="mb-3">
+    <p-inputgroup class="w-full mt-5 mb-3">
+      <p-inputgroup-addon>
+        <i class="pi pi-user"></i>
+      </p-inputgroup-addon>
+      <p-floatlabel>
+        <input
+          pInputText
+          id="nome"
+          pInputText
+          pSize="large"
+          formControlName="nome"
+        />
+        <label for="nome">Nome</label>
+      </p-floatlabel>
+    </p-inputgroup>
+  </div>
+  <div class="mt-5">
+    <p-inputgroup class="w-full mb-3">
+      <p-inputgroup-addon>
+        <i class="pi pi-inbox"></i>
+      </p-inputgroup-addon>
+      <p-floatlabel>
+        <input
+          pInputText
+          id="email"
+          pInputText
+          pSize="large"
+          formControlName="email"
+        />
+        <label for="email">Email</label>
+      </p-floatlabel>
+    </p-inputgroup>
+  </div>
+  <div class="mt-5">
+    <p-inputgroup>
+      <p-inputgroup-addon>
+        <i class="pi pi-lock"></i>
+      </p-inputgroup-addon>
+      <p-floatlabel>
+        <input
+          pInputText
+          id="senha"
+          pInputText
+          formControlName="senha"
+          pSize="large"
+          class="w-full"
+          required
+          type="password"
+        />
+        <label for="senha">Senha</label>
+      </p-floatlabel>
+    </p-inputgroup>
+  </div>
+
+  <div class="flex justify-content-end gap-3 mt-4">
+    <button
+      pButton
+      label="Cancel"
+      icon="pi pi-times"
+      severity="secondary"
+      outlined
+      (click)="onCancel()"
+    ></button>
+    <button
+      pButton
+      label="Save"
+      icon="pi pi-check"
+      type="button"
+      (click)="onSave()"
+    ></button>
+  </div>
+</form>

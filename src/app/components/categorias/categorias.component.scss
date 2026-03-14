@@ -1,0 +1,135 @@
+.page {
+  padding: 24px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.subtitle {
+  margin: 6px 0 0;
+  opacity: .7;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.search input {
+  width: 260px;
+}
+
+.nome-pill {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  color: #fff;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.cor-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 8px;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.06);
+}
+
+.cor-text {
+  opacity: .75;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+}
+
+.acoes {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.empty {
+  padding: 28px 0;
+  display: grid;
+  place-items: center;
+  gap: 10px;
+}
+
+.empty-icon {
+  font-size: 44px;
+  opacity: .35;
+}
+
+.empty-title {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.empty-subtitle {
+  opacity: .65;
+  margin-bottom: 6px;
+}
+
+.dialog-form {
+  display: grid;
+  gap: 16px;
+}
+
+.field label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.tipo-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tipo-label {
+  margin-right: 16px;
+  margin-left: 6px;
+}
+
+.cores {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.cor-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: white;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.08);
+}
+
+.cor-btn.selected {
+  border-color: rgba(0,0,0,.25);
+  transform: scale(1.02);
+}
+
+.error {
+  color: #ef4444;
+}

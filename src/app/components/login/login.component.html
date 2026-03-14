@@ -1,0 +1,77 @@
+<!-- eslint-disable @angular-eslint/template/click-events-have-key-events -->
+<!-- eslint-disable @angular-eslint/template/elements-content -->
+<!-- eslint-disable @angular-eslint/template/interactive-supports-focus -->
+<p-toast position="top-right"></p-toast>
+
+<div
+  class="flex align-items-center justify-content-center min-h-screen bg-gray-100"
+>
+  <div class="surface-card p-5 shadow-4 border-round w-full md:w-6 lg:w-4">
+    <div class="text-center">
+      <img src="assets/fincloud.png" class="w-20rem" alt="FinCloud" />
+    </div>
+
+    <form
+      [formGroup]="form"
+      (ngSubmit)="onSubmit()"
+      class="flex flex-column gap-3"
+    >
+      <p-inputgroup class="w-full mb-3">
+        <p-inputgroup-addon>
+          <i class="pi pi-inbox"></i>
+        </p-inputgroup-addon>
+        <p-floatlabel>
+          <input
+            pInputText
+            id="email"
+            pInputText
+            formControlName="email"
+            pSize="large"
+          />
+          <label for="email">Email</label>
+        </p-floatlabel>
+      </p-inputgroup>
+
+      <p-inputgroup>
+        <p-inputgroup-addon>
+          <i class="pi pi-lock"></i>
+        </p-inputgroup-addon>
+        <p-floatlabel>
+          <input
+            pInputText
+            id="password"
+            pInputText
+            type="password"
+            formControlName="password"
+            pSize="large"
+            class="w-full"
+          />
+          <label for="password">Senha</label>
+        </p-floatlabel>
+      </p-inputgroup>
+
+      <button
+        pButton
+        type="submit"
+        label="Entrar"
+        class="w-full"
+        [loading]="loading()"
+      ></button>
+
+      <div class="text-center">
+        <a class="text-primary text-sm cursor-pointer" (click)="showDialog()"
+          >Cadastrar-se</a
+        >
+      </div>
+    </form>
+  </div>
+</div>
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{ width: '32rem' }"
+  header="Criar conta"
+  (onHide)="hideDialog()"
+>
+  <app-usuario (close)="visible = false"></app-usuario>
+</p-dialog>

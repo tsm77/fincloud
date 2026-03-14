@@ -1,0 +1,67 @@
+@import "primeicons/primeicons.css";
+@import "primeicons/primeicons.css";
+@import "primeflex/primeflex.css";
+
+/* opcional: fundo parecido com a imagem */
+/* Fonte base do app */
+:root {
+  --font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+/* Global */
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family);
+  color: #0f172a; /* azul bem escuro (tipo protótipo) */
+  background: #eef2f6;
+}
+
+/* PrimeNG: força fonte em tudo */
+.p-component {
+  font-family: var(--font-family);
+}
+
+/* Tipografia “protótipo” */
+h1, h2, h3 {
+  letter-spacing: -0.02em;
+}
+
+.page-title h2 {
+  font-size: 1.25rem;  /* ~20px */
+  font-weight: 700;
+  color: #0f172a;
+}
+
+label, .p-float-label label {
+  font-size: .85rem;   /* ~13-14px */
+  font-weight: 500;
+  color: #64748b;      /* cinza azulado */
+}
+
+/* Textos secundários (subtítulo tipo de conta) */
+.muted, .type {
+  font-size: .85rem;
+  font-weight: 500;
+  color: #64748b;
+}
+
+/* Botões com cara de protótipo */
+.p-button {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Sidebar/menu: mais “clean” */
+.menu-item span {
+  font-size: .95rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.menu-item.active span {
+  color: #ffffff;
+}
