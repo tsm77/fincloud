@@ -1,84 +1,57 @@
-.account-card {
+.conta-card {
   border-radius: 14px;
-  border: 1px solid #e5e7eb;
+  padding: 1rem;
+  transition: all 0.2s ease;
 }
 
-.card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 14px 0 14px;
+.conta-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
 
-.card-header .left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.icon {
+.icon-box {
   width: 42px;
   height: 42px;
-  border-radius: 12px;
-  display: grid;
-  place-items: center;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.title .name {
-  font-weight: 800;
-  font-size: 1rem;
-  color: #111827;
+.menu-btn {
+  opacity: 0.6;
 }
 
-.title .type {
-  font-size: 0.85rem;
-  color: #6b7280;
-  margin-top: 2px;
+.conta-card:hover .menu-btn {
+  opacity: 1;
 }
 
-.saldo {
-  padding: 10px 14px 14px 14px;
-  font-weight: 800;
-  font-size: 1.15rem;
-  color: #059669;
+.divider {
+  height: 1px;
+  background: #eee;
+  margin: 1rem 0;
 }
 
-.saldo.negativo {
-  color: #dc2626;
-}
-
-/* botão de "..." */
-.icon-btn {
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 10px;
-}
-
-.icon-btn:hover {
-  background: rgba(0, 0, 0, 0.05);
-}
-.contas-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-}
-
-.account-card {
-  border-radius: 14px;
-  border: 1px solid #e5e7eb;
-}
-
-/* deixa os cards com altura parecida */
-.account-card :host ::ng-deep .p-card-body {
+.saldo-container {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 4px;
 }
 
-@media (max-width: 900px) {
-  .contas-grid {
-    grid-template-columns: 1fr;
-  }
+.saldo-container .label {
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.saldo-container .valor {
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+.saldo-container .positivo {
+  color: #16a34a;
+}
+
+.saldo-container .negativo {
+  color: #dc2626;
 }

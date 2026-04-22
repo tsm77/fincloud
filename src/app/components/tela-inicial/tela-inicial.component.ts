@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ImportsModule } from '../shared/imports';
 import { MegaMenuItem } from 'primeng/api';
 
@@ -9,7 +9,7 @@ import { MegaMenuItem } from 'primeng/api';
   templateUrl: './tela-inicial.component.html',
   styleUrl: './tela-inicial.component.scss',
 })
-export class TelaInicialComponent {
+export class TelaInicialComponent implements OnInit {
   items: MegaMenuItem[] | undefined;
 
   ngOnInit() {

@@ -2,12 +2,18 @@
   padding: 24px;
 }
 
+/* ================= HEADER ================= */
 .page-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   gap: 16px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
 }
 
 .title {
@@ -17,119 +23,106 @@
 }
 
 .subtitle {
-  margin: 6px 0 0;
-  opacity: .7;
+  margin: 4px 0 0;
+  opacity: 0.6;
+  font-size: 14px;
 }
 
-.actions {
+/* ================= ACTIONS ================= */
+.header-right {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
 .search input {
-  width: 260px;
+  width: 240px;
 }
 
+/* ================= TABLE ================= */
+.table-wrapper {
+  background: #fff;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+/* ================= TAGS ================= */
 .nome-pill {
-  display: inline-block;
   padding: 6px 12px;
   border-radius: 999px;
   color: #fff;
   font-weight: 600;
-  line-height: 1;
 }
 
 .cor-dot {
   width: 12px;
   height: 12px;
-  border-radius: 999px;
+  border-radius: 50%;
   display: inline-block;
-  vertical-align: middle;
-  margin-right: 8px;
-  box-shadow: 0 0 0 1px rgba(0,0,0,.06);
+  margin-right: 6px;
 }
 
 .cor-text {
-  opacity: .75;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 12px;
+  opacity: 0.7;
 }
 
+/* ================= ACTIONS ================= */
 .acoes {
   display: flex;
-  align-items: center;
   gap: 6px;
 }
 
+/* ================= EMPTY ================= */
 .empty {
-  padding: 28px 0;
-  display: grid;
-  place-items: center;
-  gap: 10px;
+  padding: 40px 0;
+  text-align: center;
 }
 
 .empty-icon {
-  font-size: 44px;
-  opacity: .35;
+  font-size: 48px;
+  opacity: 0.3;
 }
 
 .empty-title {
   font-weight: 700;
-  font-size: 16px;
+  margin-top: 10px;
 }
 
 .empty-subtitle {
-  opacity: .65;
-  margin-bottom: 6px;
+  opacity: 0.6;
+  margin-bottom: 12px;
 }
 
-.dialog-form {
-  display: grid;
-  gap: 16px;
-}
+/* ================= RESPONSIVO ================= */
+@media (max-width: 768px) {
 
-.field label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 6px;
-}
+  .page {
+    padding: 16px;
+  }
 
-.tipo-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
 
-.tipo-label {
-  margin-right: 16px;
-  margin-left: 6px;
-}
+  .header-right {
+    flex-direction: column;
+    align-items: stretch;
+  }
 
-.cores {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  flex-wrap: wrap;
-}
+  .search input {
+    width: 100%;
+  }
 
-.cor-btn {
-  width: 34px;
-  height: 34px;
-  border-radius: 999px;
-  border: 2px solid transparent;
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  color: white;
-  box-shadow: 0 0 0 1px rgba(0,0,0,.08);
-}
+  .btn-nova {
+    width: 100%;
+  }
 
-.cor-btn.selected {
-  border-color: rgba(0,0,0,.25);
-  transform: scale(1.02);
-}
+  /* tabela scroll horizontal */
+  .table-wrapper {
+    overflow-x: auto;
+  }
 
-.error {
-  color: #ef4444;
 }

@@ -1,6 +1,16 @@
 {
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000,
+  "editor.formatOnSave": true,
   "singleQuote": true,
   "semi": true,
   "printWidth": 100,
-  "tabWidth": 2
+  "tabWidth": 2,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }

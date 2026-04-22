@@ -1,31 +1,57 @@
-<div class="page">
-  <!-- Sidebar card -->
-  <aside class="sidebar-card">
-    <div class="brand">
+<div class="layout">
+
+  <!-- SIDEBAR DESKTOP -->
+  <aside class="sidebar-desktop">
+    <div class="logo">
       <img class="brand-logo" src="assets/fincloud.png" alt="FinCloud" />
     </div>
 
-    <nav class="menu">
-      @for (item of menu; track item.label) {
-        <a
-          class="menu-item"
-          [routerLink]="item.link!"
-          routerLinkActive="active"
-        >
-          <i class="{{ item.icon }}"></i>
-          <span>{{ item.label }}</span>
-        </a>
-      }
+    <p-panelMenu [model]="items"></p-panelMenu>
 
-      <button class="menu-item danger" type="button" (click)="logout()">
-        <i class="pi pi-power-off"></i>
-        <span>Sair</span>
+    <div class="logout">
+      <button pButton type="button" (click)="logout()" class="p-button-text">
+        <i class="pi pi-sign-out"></i> Sair
       </button>
-    </nav>
+    </div>
   </aside>
 
-  <!-- Content -->
-  <main class="content">
-    <router-outlet></router-outlet>
-  </main>
+  <!-- SIDEBAR MOBILE -->
+  <p-sidebar [(visible)]="menuOpen" position="left">
+    <div class="mobile-sidebar-content">
+      <p-panelMenu [model]="items"></p-panelMenu>
+
+      <button 
+        pButton 
+        type="button" 
+        (click)="logout()" 
+        class="p-button-text w-full">
+        <i class="pi pi-sign-out"></i> Sair
+      </button>
+    </div>
+  </p-sidebar>
+
+  <!-- CONTEÚDO -->
+  <div class="content">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+
+      <!-- BOTÃO MOBILE -->
+      <button 
+        pButton 
+        icon="pi pi-bars" 
+        (click)="menuOpen = true"
+        aria-label="Abrir menu"
+        class="menu-mobile-btn">
+      </button>
+
+      <h2>FinCloud</h2>
+    </div>
+
+    <!-- PÁGINA -->
+    <div class="page">
+      <router-outlet></router-outlet>
+    </div>
+
+  </div>
 </div>

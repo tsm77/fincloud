@@ -1,1 +1,240 @@
-<p>transacoes works!</p>
+<!-- eslint-disable @angular-eslint/template/prefer-control-flow -->
+<!-- eslint-disable @angular-eslint/template/elements-content -->
+<p-toast></p-toast>
+
+<div class="page">
+  <!-- HEADER -->
+  <div class="flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="m-0">Transações</h2>
+      <small class="text-500">Controle financeiro por categoria</small>
+    </div>
+
+    <button
+      pButton
+      icon="pi pi-plus"
+      label="Nova Transação"
+      (click)="abrirNova()"
+    ></button>
+  </div>
+
+  <!-- =========================
+       FILTRO POR MÊS (🔥 NOVO)
+  ========================= -->
+  <div class="flex justify-content-center align-items-center gap-4 mb-4">
+    <button
+      pButton
+      icon="pi pi-chevron-left"
+      class="p-button-text"
+      (click)="mesAnterior()"
+    ></button>
+
+    <div class="text-xl font-semibold">{{ mesNomeAtual }} {{ anoAtual }}</div>
+
+    <button
+      pButton
+      icon="pi pi-chevron-right"
+      class="p-button-text"
+      (click)="proximoMes()"
+    ></button>
+  </div>
+
+  <!-- =========================
+       TABELA AGRUPADA
+  ========================= -->
+  <p-table [value]="transacoesAgrupadas" dataKey="categoria">
+    <!-- HEADER -->
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 40px"></th>
+        <th>Categoria</th>
+        <th>Total</th>
+        <th></th>
+      </tr>
+    </ng-template>
+
+    <!-- BODY -->
+    <ng-template pTemplate="body" let-grupo>
+      <!-- LINHA CATEGORIA -->
+      <tr>
+        <td>
+          <button
+            pButton
+            type="button"
+            (click)="toggleCategoria(grupo.categoria)"
+            [icon]="
+              expandedCategorias[grupo.categoria]
+                ? 'pi pi-chevron-down'
+                : 'pi pi-chevron-right'
+            "
+            class="p-button-text"
+          ></button>
+        </td>
+
+        <td>
+          <div class="flex align-items-center gap-2">
+            <span
+              class="border-circle"
+              style="width: 10px; height: 10px"
+              [style.background]="grupo.cor"
+            ></span>
+
+            <b>{{ grupo.categoria }}</b>
+          </div>
+        </td>
+
+        <td>
+          <b>{{ grupo.total | currency: "BRL" }}</b>
+        </td>
+
+        <td></td>
+      </tr>
+
+      <!-- EXPANSÃO -->
+      <tr *ngIf="expandedCategorias[grupo.categoria]">
+        <td colspan="6">
+          <table class="w-full sub-table">
+            <thead>
+              <tr>
+                <th style="width: 120px">Data</th>
+                <th>Descrição</th>
+                <th>Conta</th>
+                <th style="width: 120px; text-align: right">Valor</th>
+                <th style="width: 80px; text-align: center">Pago</th>
+                <th style="width: 100px"></th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (item of grupo.itens; track item) {
+                <tr>
+                  <td style="width: 120px">
+                    {{ item.data | date: "dd/MM/yyyy" }}
+                  </td>
+
+                  <td>{{ item.descricao }}</td>
+
+                  <td>{{ item.contaNome }}</td>
+
+                  <td
+                    style="width: 120px; text-align: right"
+                    class="text-red-500"
+                  >
+                    {{ item.valor | currency: "BRL" }}
+                  </td>
+
+                  <td style="width: 80px; text-align: center">
+                    <p-checkbox
+                      [(ngModel)]="item.pago"
+                      binary="true"
+                    ></p-checkbox>
+                  </td>
+
+                  <td style="width: 100px">
+                    <button
+                      pButton
+                      icon="pi pi-pencil"
+                      class="p-button-text"
+                    ></button>
+                    <button
+                      pButton
+                      icon="pi pi-trash"
+                      class="p-button-text"
+                    ></button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- =========================
+     DIALOG
+========================= -->
+<p-dialog
+  header="Nova Transação"
+  [visible]="dialogAberto()"
+  (visibleChange)="dialogAberto.set($event)"
+  [modal]="true"
+  [style]="{ width: '600px' }"
+  [contentStyle]="{ overflow: 'visible' }"
+  [baseZIndex]="10000"
+>
+  <form [formGroup]="form" class="flex flex-column gap-3">
+    <p-dropdown
+      [options]="contas()"
+      optionLabel="nome"
+      optionValue="id"
+      formControlName="contaId"
+      placeholder="Conta"
+    ></p-dropdown>
+
+    <p-dropdown
+      [options]="categorias()"
+      optionLabel="nome"
+      optionValue="id"
+      formControlName="categoriaId"
+      placeholder="Categoria"
+    ></p-dropdown>
+
+    <p-datepicker
+      formControlName="data"
+      dateFormat="dd/mm/yy"
+      [showIcon]="true"
+      appendTo="body"
+      inputStyleClass="w-full"
+    ></p-datepicker>
+
+    <div formArrayName="items">
+      <div
+        *ngFor="let item of items.controls; let i = index"
+        [formGroupName]="i"
+        class="item-row flex gap-2 align-items-center"
+      >
+        <input
+          pInputText
+          formControlName="descricao"
+          placeholder="Descrição"
+          class="flex-1"
+        />
+
+        <input
+          type="number"
+          pInputText
+          formControlName="valor"
+          style="width: 120px"
+        />
+
+        <p-checkbox formControlName="parcelado" binary="true"></p-checkbox>
+
+        <button
+          pButton
+          icon="pi pi-trash"
+          (click)="removerItem(i)"
+          type="button"
+        ></button>
+      </div>
+    </div>
+
+    <button
+      pButton
+      label="Adicionar item"
+      (click)="adicionarItem()"
+      type="button"
+    ></button>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancelar" (click)="fecharDialog()"></button>
+    <button
+      pButton
+      label="Salvar"
+      (click)="salvar()"
+      [disabled]="form.invalid"
+    ></button>
+  </ng-template>
+</p-dialog>

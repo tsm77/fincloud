@@ -1,16 +1,21 @@
-<!-- eslint-disable @angular-eslint/template/elements-content -->
-<!-- eslint-disable @angular-eslint/template/label-has-associated-control -->
 <p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>
 
 <div class="page">
+
+  <!-- HEADER -->
   <div class="page-header">
-    <div>
+    
+    <div class="header-left">
       <h2 class="title">Categorias</h2>
-      <p class="subtitle">Crie e gerencie as categorias de entrada e saída.</p>
+      <p class="subtitle">
+        Crie e gerencie as categorias de entrada e saída.
+      </p>
     </div>
 
-    <div class="actions">
+    <div class="header-right">
+
+      <!-- BUSCA -->
       <span class="p-input-icon-left search">
         <i class="pi pi-search"></i>
         <input
@@ -22,92 +27,111 @@
         />
       </span>
 
+      <!-- BOTÃO NOVA -->
       <button
         pButton
         icon="pi pi-plus"
         label="Nova Categoria"
         (click)="abrirNova()"
+        aria-label="Nova categoria"
       ></button>
+
     </div>
   </div>
 
-  <p-table
-    [value]="categoriasFiltradas()"
-    [loading]="loading()"
-    [paginator]="true"
-    [rows]="10"
-    [rowsPerPageOptions]="[10, 20, 50]"
-    [tableStyle]="{ 'min-width': '760px' }"
-  >
-    <ng-template pTemplate="header">
-      <tr>
-        <th>Nome</th>
-        <th style="width: 140px">Tipo</th>
-        <th style="width: 120px">Cor</th>
-        <th style="width: 140px">Ações</th>
-      </tr>
-    </ng-template>
+  <!-- TABELA -->
+  <div class="table-wrapper">
+    <p-table
+      [value]="categoriasFiltradas()"
+      [loading]="loading()"
+      [paginator]="true"
+      [rows]="10"
+      [rowsPerPageOptions]="[10, 20, 50]"
+      responsiveLayout="scroll"
+    >
 
-    <ng-template pTemplate="body" let-cat>
-      <tr>
-        <td>
-          <span class="nome-pill" [style.background]="cat.cor">{{
-            cat.nome
-          }}</span>
-        </td>
+      <!-- HEADER -->
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Nome</th>
+          <th>Tipo</th>
+          <th>Cor</th>
+          <th>Ações</th>
+        </tr>
+      </ng-template>
 
-        <td>
-          <p-tag
-            [value]="tipoLabel(cat.tipo)"
-            [severity]="tipoSeverity(cat.tipo)"
-          ></p-tag>
-        </td>
+      <!-- BODY -->
+      <ng-template pTemplate="body" let-cat>
+        <tr>
+          <td>
+            <span class="nome-pill" [style.background]="cat.cor">
+              {{ cat.nome }}
+            </span>
+          </td>
 
-        <td>
-          <span class="cor-dot" [style.background]="cat.cor"></span>
-          <span class="cor-text">{{ cat.cor }}</span>
-        </td>
+          <td>
+            <p-tag
+              [value]="tipoLabel(cat.tipo)"
+              [severity]="tipoSeverity(cat.tipo)"
+            ></p-tag>
+          </td>
 
-        <td class="acoes">
-          <button
-            pButton
-            icon="pi pi-pencil"
-            class="p-button-text"
-            (click)="abrirEdicao(cat)"
-          ></button>
-          <button
-            pButton
-            icon="pi pi-trash"
-            class="p-button-text p-button-danger"
-            (click)="confirmarRemocao(cat)"
-          ></button>
-        </td>
-      </tr>
-    </ng-template>
+          <td>
+            <span class="cor-dot" [style.background]="cat.cor"></span>
+            <span class="cor-text">{{ cat.cor }}</span>
+          </td>
 
-    <ng-template pTemplate="emptymessage">
-      <tr>
-        <td colspan="4">
-          <div class="empty">
-            <i class="pi pi-inbox empty-icon"></i>
-            <div class="empty-title">Nenhuma categoria ainda</div>
-            <div class="empty-subtitle">
-              Comece criando uma nova categoria para gerir suas receitas e
-              despesas.
-            </div>
+          <td class="acoes">
             <button
               pButton
-              icon="pi pi-plus"
-              label="Nova Categoria"
-              (click)="abrirNova()"
-            ></button>
-          </div>
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
+              icon="pi pi-pencil"
+              class="p-button-text"
+              (click)="abrirEdicao(cat)"
+              aria-label="Editar categoria">
+            </button>
+
+            <button
+              pButton
+              icon="pi pi-trash"
+              class="p-button-text p-button-danger"
+              (click)="confirmarRemocao(cat)"
+              aria-label="Excluir categoria">
+            </button>
+          </td>
+        </tr>
+      </ng-template>
+
+      <!-- EMPTY -->
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="4">
+            <div class="empty">
+              <i class="pi pi-inbox empty-icon"></i>
+
+              <div class="empty-title">
+                Nenhuma categoria ainda
+              </div>
+
+              <div class="empty-subtitle">
+                Comece criando uma nova categoria.
+              </div>
+
+              <button
+                pButton
+                icon="pi pi-plus"
+                label="Nova Categoria"
+                (click)="abrirNova()">
+              </button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+    </p-table>
+  </div>
 </div>
 
+<!-- 🔥 DIALOG CORRIGIDO -->
 <p-dialog
   [header]="modoEdicao() ? 'Editar Categoria' : 'Nova Categoria'"
   [visible]="dialogAberto()"
@@ -115,76 +139,93 @@
   [modal]="true"
   [draggable]="false"
   [resizable]="false"
-  [style]="{ width: '520px' }"
+  [style]="{ width: '520px', maxWidth: '95vw' }"
   (onHide)="fecharDialog()"
 >
+
   <form class="dialog-form" [formGroup]="form">
+
+    <!-- NOME -->
     <div class="field">
-      <label>Nome</label>
+      <label for="nome">Nome</label>
       <input
+        id="nome"
         pInputText
         formControlName="nome"
         placeholder="Nome da categoria"
       />
       @if (form.controls.nome.touched && form.controls.nome.invalid) {
-        <small class="error">Informe um nome (2–40 caracteres).</small>
+        <small class="error">
+          Informe um nome (2–40 caracteres).
+        </small>
       }
     </div>
 
+    <!-- TIPO -->
     <div class="field">
-      <label>Tipo</label>
+      <label for="tipo">Tipo</label>
       <div class="tipo-row">
+
         <p-radioButton
-          inputId="despesa"
+          inputId="receita"
           name="tipo"
+          id="tipo"
           value="RECEITA"
-          formControlName="tipo"
-        ></p-radioButton>
+          formControlName="tipo">
+        </p-radioButton>
         <label for="receita" class="tipo-label">Receita</label>
 
         <p-radioButton
           inputId="despesa"
           name="tipo"
           value="DESPESA"
-          formControlName="tipo"
-        ></p-radioButton>
+          formControlName="tipo">
+        </p-radioButton>
         <label for="despesa" class="tipo-label">Despesa</label>
+
       </div>
     </div>
 
+    <!-- CORES -->
     <div class="field">
-      <label>Cor</label>
+      <label for="cor">Cor</label>
       <div class="cores">
         @for (c of cores; track c) {
           <button
             type="button"
+            id="cor"
             class="cor-btn"
             [class.selected]="form.controls.cor.value === c"
             [style.background]="c"
             (click)="selecionarCor(c)"
-            aria-label="Selecionar cor"
-          >
+            aria-label="Selecionar cor">
+
             @if (form.controls.cor.value === c) {
               <i class="pi pi-check"></i>
             }
+
           </button>
         }
       </div>
     </div>
+
   </form>
 
+  <!-- FOOTER -->
   <ng-template pTemplate="footer">
     <button
       pButton
       class="p-button-text"
       label="Cancelar"
-      (click)="fecharDialog()"
-    ></button>
+      (click)="fecharDialog()">
+    </button>
+
     <button
       pButton
       label="Salvar"
       [disabled]="loading()"
-      (click)="salvar()"
-    ></button>
+      (click)="salvar()">
+    </button>
   </ng-template>
+
 </p-dialog>

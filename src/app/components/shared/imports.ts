@@ -104,6 +104,8 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { DrawerModule } from 'primeng/drawer';
 import { PopoverModule } from 'primeng/popover';
+import { DropdownModule } from 'primeng/dropdown';
+import { ChartModule } from 'primeng/chart';
 
 @NgModule({
   imports: [
@@ -212,6 +214,7 @@ import { PopoverModule } from 'primeng/popover';
     AutoFocusModule,
     OverlayBadgeModule,
     PopoverModule,
+    ChartModule,
   ],
   exports: [
     TabsModule,
@@ -319,6 +322,8 @@ import { PopoverModule } from 'primeng/popover';
     AutoFocusModule,
     OverlayBadgeModule,
     PopoverModule,
+    DropdownModule,
+    ChartModule,
   ],
   providers: [],
 })

@@ -1,8 +1,10 @@
-<!-- eslint-disable @angular-eslint/template/label-has-associated-control -->
 <!-- eslint-disable @angular-eslint/template/elements-content -->
-<!-- HEADER DA PÁGINA -->
-<div class="page-header flex justify-content-between align-items-center mb-4">
-  <h2 class="m-0">Contas</h2>
+<!-- HEADER -->
+<div class="flex justify-content-between align-items-center mb-4">
+  <div>
+    <h2 class="m-0">Contas</h2>
+    <small class="text-500">Gerencie suas contas financeiras</small>
+  </div>
 
   <button
     pButton
@@ -12,156 +14,63 @@
   ></button>
 </div>
 
-<!-- GRID DE CONTAS -->
-<div class="contas-grid">
+<!-- MENU GLOBAL -->
+<p-menu
+  #menu
+  [popup]="true"
+  [model]="menuItemsSelecionado"
+  appendTo="body"
+></p-menu>
+
+<!-- GRID -->
+<div class="grid">
   @for (c of contasFiltradas(); track c.id) {
-    <p-card class="account-card">
-      <!-- HEADER -->
-      <p-panel>
-        <div class="flex align-items-center gap-3 flex-nowrap">
-          <!-- ESQUERDA -->
-          <div class="flex align-items-center gap-3 min-w-0 flex-1">
-            <div class="icon-circle" [style.background]="c.cor + '22'">
-              <i class="pi pi-credit-card" [style.color]="c.cor"></i>
+    <div class="col-12 md:col-6 lg:col-4">
+      <p-card styleClass="conta-card">
+        <!-- HEADER -->
+        <div class="flex justify-content-between align-items-center">
+          <!-- INFO -->
+          <div class="flex align-items-center gap-3">
+            <div class="icon-box" [style.background]="c.cor + '22'">
+              <i class="pi pi-wallet" [style.color]="c.cor"></i>
             </div>
 
-            <div class="min-w-0">
-              <div
-                class="font-semibold text-lg text-overflow-ellipsis overflow-hidden white-space-nowrap"
-              >
+            <div>
+              <div class="font-semibold text-lg">
                 {{ c.nome }}
               </div>
-              <div
-                class="text-sm text-500 text-overflow-ellipsis overflow-hidden white-space-nowrap"
-              >
-                {{ c.tipo }}
-              </div>
+
+              <p-chip [label]="c.tipo" styleClass="text-xs mt-1"></p-chip>
             </div>
           </div>
 
-          <!-- DIREITA (ações) -->
-          <div class="flex align-items-center">
-            <p-button
-              type="button"
-              severity="success"
-              [rounded]="true"
-              [text]="true"
-              icon="pi pi-ellipsis-v"
-              (onClick)="menu.toggle($event)"
-              ariaLabel="Opções"
-            ></p-button>
+          <!-- BOTÃO MENU -->
+          <button
+            pButton
+            icon="pi pi-ellipsis-v"
+            class="p-button-text p-button-rounded menu-btn"
+            (click)="abrirMenu($event, c, menu)"
+          ></button>
+        </div>
 
-            <p-menu #menu [popup]="true" [model]="menuItems()"></p-menu>
+        <!-- DIVIDER -->
+        <div class="divider"></div>
+
+        <!-- SALDO -->
+        <div class="saldo-container">
+          <span class="label">Saldo atual</span>
+
+          <div
+            class="valor"
+            [ngClass]="{
+              positivo: c.saldo >= 0,
+              negativo: c.saldo < 0,
+            }"
+          >
+            {{ c.saldo | currency: "BRL" }}
           </div>
         </div>
-      </p-panel>
-
-      <!-- SALDO -->
-      <div
-        class="text-xl font-semibold mt-3"
-        [ngClass]="{
-          'text-green-600': c.saldo >= 0,
-          'text-red-500': c.saldo < 0,
-        }"
-      >
-        Saldo - {{ c.saldo | currency: "BRL" : "symbol" : "1.2-2" }}
-      </div>
-    </p-card>
+      </p-card>
+    </div>
   }
 </div>
-
-<!-- MODAL NOVA CONTA -->
-<p-dialog
-  header="Nova Conta"
-  [visible]="modalNovaConta()"
-  (visibleChange)="modalNovaConta.set($event)"
-  [modal]="true"
-  [draggable]="false"
-  [resizable]="false"
-  [style]="{ width: '30rem' }"
->
-  <form [formGroup]="form" class="flex flex-column gap-4 mt-2">
-    <!-- Nome -->
-    <div class="field">
-      <label class="font-medium mb-2 block">Nome</label>
-      <input
-        pInputText
-        formControlName="nome"
-        class="w-full"
-        placeholder="Nome da Conta"
-      />
-
-      @if (form.controls.nome.touched && form.controls.nome.invalid) {
-        <small class="p-error">
-          Informe um nome válido (mín. 2 caracteres)
-        </small>
-      }
-    </div>
-
-    <!-- Tipo -->
-    <div class="field">
-      <label class="font-medium mb-2 block">Tipo de Conta</label>
-
-      <p-dropdown
-        [options]="tipos"
-        optionLabel="label"
-        optionValue="value"
-        formControlName="tipo"
-        class="w-full"
-      ></p-dropdown>
-    </div>
-
-    <!-- Saldo -->
-    <div class="field">
-      <label class="font-medium mb-2 block"> Saldo inicial (opcional) </label>
-
-      <p-inputNumber
-        formControlName="saldoInicial"
-        mode="currency"
-        currency="BRL"
-        locale="pt-BR"
-        class="w-full"
-      ></p-inputNumber>
-    </div>
-
-    <!-- Cor -->
-    <div class="field">
-      <label class="font-medium mb-3 block">Cor</label>
-
-      <div class="flex gap-3">
-        @for (cor of cores; track cor) {
-          <button
-            type="button"
-            class="cor-btn"
-            [class.active]="form.controls.cor.value === cor"
-            [style.background]="cor"
-            (click)="setCor(cor)"
-          >
-            @if (form.controls.cor.value === cor) {
-              <i class="pi pi-check text-white"></i>
-            }
-          </button>
-        }
-      </div>
-    </div>
-
-    <!-- AÇÕES -->
-    <div class="flex justify-content-end gap-3 mt-3">
-      <button
-        pButton
-        type="button"
-        label="Cancelar"
-        severity="secondary"
-        outlined
-        (click)="cancelarModal()"
-      ></button>
-
-      <button
-        pButton
-        type="button"
-        label="Salvar"
-        (click)="salvarConta()"
-      ></button>
-    </div>
-  </form>
-</p-dialog>

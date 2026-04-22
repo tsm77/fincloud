@@ -14,7 +14,7 @@ export interface ContaResponseDTO {
   id: number;
   nome: string;
   tipo: string;
-  saldo: number;
+  saldoInicial: number;
   cor?: string;
 }
 
@@ -31,7 +31,7 @@ export class ContaService {
     return this.http.post<ContaResponseDTO>(this.baseUrl, payload);
   }
 
-  // se precisar:
-  // editar(id: number, payload: ContaUpdateDTO) { ... }
-  // remover(id: number) { ... }
+  remover(id: number) {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
 }
