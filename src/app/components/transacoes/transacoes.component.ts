@@ -16,25 +16,20 @@ import { finalize } from 'rxjs';
 import { TransacoesService } from '../../core/services/transacoes.service';
 import { CategoriaService } from '../../core/services/categorias.service';
 
-import {
-  Transacao,
-  TransacaoCreateDto,
-} from '../../core/interfaces/transacoes.model';
+import { Transacao } from '../../core/interfaces/transacoes.model';
 
 import { Categoria } from '../../core/interfaces/categorias.model';
 
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { ImportsModule } from '../shared/imports';
-import {
-  ContaResponseDTO,
-  ContaService,
-} from '../../core/services/contas.service';
+import { ContaService } from '../../core/services/contas.service';
+import { ContaResponseDTO } from '../../core/interfaces/conta.model';
 
 @Component({
   selector: 'app-transacoes',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, ImportsModule],
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './transacoes.component.html',
   styleUrls: ['./transacoes.component.scss'],
 })
@@ -45,6 +40,8 @@ export class TransacoesComponent {
   private readonly fb = inject(FormBuilder);
   private readonly msg = inject(MessageService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly messageService = inject(MessageService);
+  private readonly confirmationService = inject(ConfirmationService);
 
   // =========================
   // STATE
@@ -84,8 +81,8 @@ export class TransacoesComponent {
   // INIT
   // =========================
   constructor() {
-    this.carregar();
     this.carregarDadosAuxiliares();
+    this.carregar();
     this.adicionarItem();
   }
 
@@ -243,11 +240,17 @@ export class TransacoesComponent {
       return;
     }
 
-    const dto: TransacaoCreateDto = {
+    // 🔥 calcula total (resolve erro "valor é obrigatório")
+    const total = this.items.controls
+      .map((c) => Number(c.value.valor))
+      .reduce((a, b) => a + b, 0);
+
+    const dto: any = {
       contaId: v.contaId!,
       categoriaId: v.categoriaId!,
       tipo,
       data: this.formatarData(v.data!),
+      valor: total, // 🔥 ESSENCIAL
       itens: this.items.controls.map((control) => {
         const i = control.getRawValue();
 
@@ -262,19 +265,27 @@ export class TransacoesComponent {
 
     this.loading.set(true);
 
-    this.service
-      .criar(dto)
-      .pipe(finalize(() => this.loading.set(false)))
-      .subscribe({
-        next: () => {
-          this.toastSucesso('Transação criada!');
-          this.fecharDialog();
-          this.carregar();
-        },
-        error: () => this.toastErro('Erro ao salvar'),
-      });
-  }
+    // 🔥 decide entre criar ou editar
+    const request = this.editandoId
+      ? this.service.editar(this.editandoId, dto)
+      : this.service.criar(dto);
 
+    request.pipe(finalize(() => this.loading.set(false))).subscribe({
+      next: () => {
+        this.toastSucesso(
+          this.editandoId ? 'Transação atualizada!' : 'Transação criada!',
+        );
+
+        this.fecharDialog();
+
+        this.editandoId = null; // 🔥 MUITO IMPORTANTE
+        this.carregar();
+      },
+      error: () => {
+        this.toastErro('Erro ao salvar');
+      },
+    });
+  }
   remover(t: Transacao) {
     this.service.remover(t.id).subscribe(() => this.carregar());
   }
@@ -300,6 +311,7 @@ export class TransacoesComponent {
   }
 
   abrirNova() {
+    this.editandoId = null;
     this.form.reset();
     this.form.setControl('items', this.fb.array<FormGroup>([this.criarItem()]));
     this.dialogAberto.set(true);
@@ -322,7 +334,7 @@ export class TransacoesComponent {
 
     this.items.push(
       this.fb.group({
-        descricao: item.descricao.replace(/\(\d+\/\d+\)/, '').trim(),
+        descricao: (item.descricao || '').replace(/\(\d+\/\d+\)/, '').trim(), // 🔥 FIX
         valor: item.valor,
         parcelado: item.totalParcelas > 1,
         numeroParcelas: item.totalParcelas || 1,
@@ -356,5 +368,58 @@ export class TransacoesComponent {
 
   private toastErro(detail: string) {
     this.msg.add({ severity: 'error', summary: 'Erro', detail });
+  }
+
+  confirmarPagamento(event: any, item: any) {
+    const valorAnterior = item.pago;
+    const novoValor = event.checked;
+
+    // volta estado imediato
+    item.pago = valorAnterior;
+    this.cdr.detectChanges();
+
+    this.confirmationService.confirm({
+      message: novoValor
+        ? `Deseja marcar "${item.descricao}" como paga?`
+        : `Deseja remover o pagamento de "${item.descricao}"?`,
+      header: 'Confirmação',
+      icon: 'pi pi-exclamation-triangle',
+
+      acceptLabel: 'Sim',
+      rejectLabel: 'Cancelar',
+
+      accept: () => {
+        item.pago = novoValor;
+
+        this.service.atualizarPago(item.id, novoValor).subscribe({
+          next: () => {
+            // ✅ MENSAGEM DE SUCESSO
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Sucesso',
+              detail: novoValor
+                ? 'Pagamento realizado com sucesso!'
+                : 'Pagamento removido com sucesso!',
+            });
+          },
+          error: () => {
+            item.pago = valorAnterior;
+            this.cdr.detectChanges();
+
+            // ❌ MENSAGEM DE ERRO
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Erro',
+              detail: 'Falha ao atualizar pagamento',
+            });
+          },
+        });
+      },
+
+      reject: () => {
+        item.pago = valorAnterior;
+        this.cdr.detectChanges();
+      },
+    });
   }
 }

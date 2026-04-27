@@ -4,7 +4,7 @@ export interface Categoria {
   id: number;
   nome: string;
   tipo: CategoriaTipo;
-  cor: string; // ex: "#22c55e" ou "green"
+  cor: string;
 }
 
 export interface CategoriaCreateDto {

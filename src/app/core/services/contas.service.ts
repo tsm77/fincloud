@@ -2,21 +2,12 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environments';
-
-export interface ContaCreateDTO {
-  nome: string;
-  tipo: string; // ex: 'CONTA_CORRENTE' | 'CARTEIRA' etc (ajuste ao seu enum)
-  saldoInicial?: number;
-  cor?: string;
-}
-
-export interface ContaResponseDTO {
-  id: number;
-  nome: string;
-  tipo: string;
-  saldoInicial: number;
-  cor?: string;
-}
+import {
+  Conta,
+  ContaCreateDTO,
+  ContaResponseDTO,
+  ContaUpdateDTO,
+} from '../interfaces/conta.model';
 
 @Injectable({ providedIn: 'root' })
 export class ContaService {
@@ -33,5 +24,9 @@ export class ContaService {
 
   remover(id: number) {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  editar(id: number, dto: ContaUpdateDTO) {
+    return this.http.put<Conta>(`${this.baseUrl}/${id}`, dto);
   }
 }

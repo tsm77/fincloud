@@ -10,6 +10,7 @@ export interface Transacao {
   contaNome: string;
   categoriaId: number;
   categoriaNome: string;
+  categoriaCor: string;
   dataCriacao: string;
   pago?: boolean; //
 }

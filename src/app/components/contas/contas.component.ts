@@ -8,17 +8,17 @@ import { MessageService } from 'primeng/api';
 
 import { ImportsModule } from '../shared/imports';
 import {
-  ContaCreateDTO,
-  ContaResponseDTO,
-  ContaService,
-} from '../../core/services/contas.service';
-import {
   BACK_TO_UI,
   BackendTipoConta,
   TipoConta,
   UI_TO_BACK,
 } from '../../core/interfaces/tipo-conta.enum';
-import { Conta } from '../../core/interfaces/conta.model';
+import {
+  Conta,
+  ContaCreateDTO,
+  ContaResponseDTO,
+} from '../../core/interfaces/conta.model';
+import { ContaService } from '../../core/services/contas.service';
 
 function normalizeBackendTipo(tipo: string): BackendTipoConta | null {
   const t = (tipo ?? '').toUpperCase();
@@ -61,6 +61,7 @@ export class ContasComponent implements OnInit {
   readonly contas = signal<Conta[]>([]);
   menuItemsSelecionado: any[] = [];
   contaSelecionada: any;
+  editandoId: number | null = null;
 
   /** =========================
    *  DROPDOWN
@@ -73,16 +74,6 @@ export class ContasComponent implements OnInit {
     { label: 'Cartão de Crédito', value: 'Cartão de Crédito' as TipoConta },
     { label: 'Investimento', value: 'Investimento' as TipoConta },
     { label: 'Conta Poupança', value: 'Conta Poupança' as TipoConta },
-  ];
-
-  readonly cores = [
-    '#1D4ED8',
-    '#22C55E',
-    '#06B6D4',
-    '#F59E0B',
-    '#A855F7',
-    '#EF4444',
-    '#94A3B8',
   ];
 
   /** =========================
@@ -112,7 +103,6 @@ export class ContasComponent implements OnInit {
     nome: this.fb.control('', [Validators.required, Validators.minLength(2)]),
     tipo: this.fb.control<TipoConta>('Conta Corrente', [Validators.required]),
     saldoInicial: this.fb.control<number>(0),
-    cor: this.fb.control<string>(this.cores[0], [Validators.required]),
   });
 
   /** =========================
@@ -135,7 +125,6 @@ export class ContasComponent implements OnInit {
       nome: dto.nome,
       tipo: BACK_TO_UI[tipoNormalizado],
       saldo: Number(dto.saldoInicial ?? dto.saldoInicial ?? 0),
-      cor: dto.cor ?? this.cores[0],
     };
   }
 
@@ -146,7 +135,6 @@ export class ContasComponent implements OnInit {
       nome: v.nome,
       tipo: UI_TO_BACK[v.tipo],
       saldoInicial: Number(v.saldoInicial ?? 0),
-      cor: v.cor,
     };
   }
 
@@ -179,11 +167,11 @@ export class ContasComponent implements OnInit {
    *  ========================= */
 
   abrirModal(): void {
+    this.editandoId = null;
     this.form.reset({
       nome: '',
       tipo: 'Conta Corrente',
       saldoInicial: 0,
-      cor: this.cores[0],
     });
 
     this.modalNovaConta.set(true);
@@ -207,34 +195,49 @@ export class ContasComponent implements OnInit {
     try {
       const payload = this.toPayload();
 
-      await firstValueFrom(this.contaService.criar(payload));
+      if (this.editandoId) {
+        // ✏️ EDITAR
+        await firstValueFrom(
+          this.contaService.editar(this.editandoId, payload),
+        );
 
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Sucesso',
-        detail: 'Conta criada com sucesso!',
-      });
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Sucesso',
+          detail: 'Conta atualizada com sucesso!',
+        });
+      } else {
+        // 🆕 CRIAR
+        await firstValueFrom(this.contaService.criar(payload));
+
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Sucesso',
+          detail: 'Conta criada com sucesso!',
+        });
+      }
 
       this.modalNovaConta.set(false);
-
+      this.editandoId = null; // 🔥 IMPORTANTE
       await this.carregarContas();
     } catch (e: any) {
       this.messageService.add({
         severity: 'error',
         summary: 'Erro',
-        detail: e?.error?.message ?? 'Falha ao criar conta',
+        detail: e?.error?.message ?? 'Erro ao salvar conta',
       });
     } finally {
       this.saving.set(false);
     }
   }
 
-  editar(conta: Conta): void {
+  editar(conta: Conta) {
+    this.editandoId = conta.id; // 🔥 ESSENCIAL
+
     this.form.reset({
       nome: conta.nome,
       tipo: conta.tipo,
       saldoInicial: conta.saldo,
-      cor: conta.cor,
     });
 
     this.modalNovaConta.set(true);
@@ -246,10 +249,6 @@ export class ContasComponent implements OnInit {
         c.id === conta.id ? { ...c, arquivada: true } : c,
       ),
     );
-  }
-
-  setCor(cor: string): void {
-    this.form.controls.cor.setValue(cor);
   }
 
   abrirMenu(event: any, conta: any, menu: any) {

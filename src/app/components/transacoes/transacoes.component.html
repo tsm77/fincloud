@@ -1,7 +1,7 @@
 <!-- eslint-disable @angular-eslint/template/prefer-control-flow -->
 <!-- eslint-disable @angular-eslint/template/elements-content -->
 <p-toast></p-toast>
-
+<p-confirmDialog></p-confirmDialog>
 <div class="page">
   <!-- HEADER -->
   <div class="flex justify-content-between align-items-center mb-4">
@@ -118,15 +118,19 @@
 
                   <td
                     style="width: 120px; text-align: right"
-                    class="text-red-500"
+                    [ngClass]="{
+                      'text-green-500': item.pago,
+                      'text-red-500': !item.pago,
+                    }"
                   >
                     {{ item.valor | currency: "BRL" }}
                   </td>
 
                   <td style="width: 80px; text-align: center">
                     <p-checkbox
-                      [(ngModel)]="item.pago"
-                      binary="true"
+                      [binary]="true"
+                      [ngModel]="item.pago"
+                      (onChange)="confirmarPagamento($event, item)"
                     ></p-checkbox>
                   </td>
 
@@ -135,10 +139,12 @@
                       pButton
                       icon="pi pi-pencil"
                       class="p-button-text"
+                      (click)="editar(item)"
                     ></button>
                     <button
                       pButton
                       icon="pi pi-trash"
+                      (click)="remover(item)"
                       class="p-button-text"
                     ></button>
                   </td>
@@ -210,6 +216,16 @@
         />
 
         <p-checkbox formControlName="parcelado" binary="true"></p-checkbox>
+
+        @if (item.get("parcelado")?.value) {
+          <input
+            type="number"
+            pInputText
+            formControlName="numeroParcelas"
+            placeholder="Parcelas"
+            style="width: 80px"
+          />
+        }
 
         <button
           pButton
