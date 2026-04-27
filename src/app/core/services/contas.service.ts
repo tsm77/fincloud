@@ -1,13 +1,13 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environments';
 import {
   Conta,
   ContaCreateDTO,
   ContaResponseDTO,
   ContaUpdateDTO,
 } from '../interfaces/conta.model';
+import { environment } from '../../../environments/environment-prod';
 
 @Injectable({ providedIn: 'root' })
 export class ContaService {

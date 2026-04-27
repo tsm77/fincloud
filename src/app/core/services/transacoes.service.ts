@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environments';
 import { Transacao, TransacaoCreateDto } from '../interfaces/transacoes.model';
+import { environment } from '../../../environments/environment-prod';
 
 @Injectable({ providedIn: 'root' })
 export class TransacoesService {

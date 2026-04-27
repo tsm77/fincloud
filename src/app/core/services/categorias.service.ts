@@ -5,7 +5,7 @@ import {
   CategoriaCreateDto,
   CategoriaUpdateDto,
 } from '../interfaces/categorias.model';
-import { environment } from '../../../environments/environments';
+import { environment } from '../../../environments/environment-prod';
 
 @Injectable({ providedIn: 'root' })
 export class CategoriaService {
