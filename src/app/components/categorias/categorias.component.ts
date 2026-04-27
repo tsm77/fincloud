@@ -183,7 +183,7 @@ export class CategoriasComponent {
   }
 
   private toastSucesso(detail: string) {
-    this.msg.add({ severity: 'success', summary: 'Ok', detail });
+    this.msg.add({ severity: 'success', summary: 'Sucesso!', detail });
   }
 
   private toastErro(detail: string) {
