@@ -19,6 +19,7 @@ export class LayoutComponent {
   private router = inject(Router);
 
   menuOpen = false;
+  userName = 'Tiago';
 
   items: MenuItem[] = [
     {
@@ -44,7 +45,7 @@ export class LayoutComponent {
     {
       label: 'Relatórios',
       icon: 'pi pi-chart-bar',
-      routerLink: '',
+      routerLink: '/relatorios',
     },
     {
       label: 'Configurações',

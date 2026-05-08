@@ -3,22 +3,9 @@ import { Component, OnInit, inject } from '@angular/core';
 import { ImportsModule } from '../shared/imports';
 import { firstValueFrom } from 'rxjs';
 import { TransacoesService } from '../../core/services/transacoes.service';
-
-interface Transacao {
-  id: number;
-  descricao: string;
-  valor: number;
-  tipo: 'RECEITA' | 'DESPESA';
-  data: string | Date;
-  categoriaNome: string;
-}
-
-interface ResumoCategoria {
-  nome: string;
-  valor: number;
-  percentual: string;
-  cor: string;
-}
+import { ContaResponseDTO } from '../../core/interfaces/conta.model';
+import { Transacao } from '../../core/interfaces/transacoes.model';
+import { ContaService } from '../../core/services/contas.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -29,30 +16,26 @@ interface ResumoCategoria {
 })
 export class DashboardComponent implements OnInit {
   private service = inject(TransacoesService);
+  private contasService = inject(ContaService);
 
   // 🔢 RESUMO
   saldoTotal = 0;
   totalReceitas = 0;
   totalDespesas = 0;
+  totalInvestido = 0;
 
   // 📋 LISTA
   ultimasTransacoes: Transacao[] = [];
 
-  // 📊 GRÁFICO
-  graficoCategorias: any;
-  resumoCategorias: ResumoCategoria[] = [];
+  //  CONTAS PAGAS E NÃO PAGAS
+  contasNaoPagas: Transacao[] = [];
+  contasPagas: Transacao[] = [];
+  contasNaoPagesTotalValor = 0;
+  contasPagasTotalValor = 0;
 
   // 📅 FILTRO (NOVO)
   dataInicial: Date | null = null;
   dataFinal: Date | null = null;
-
-  chartOptions = {
-    plugins: {
-      legend: {
-        display: false,
-      },
-    },
-  };
 
   loading = false;
 
@@ -74,9 +57,15 @@ export class DashboardComponent implements OnInit {
     this.loading = true;
 
     try {
-      const lista = await firstValueFrom(this.service.listar());
-      const transacoes: Transacao[] = lista ?? [];
+      const [listaTransacoes, listaContas] = await Promise.all([
+        firstValueFrom(this.service.listar()),
+        firstValueFrom(this.contasService.listar()),
+      ]);
 
+      const transacoes: Transacao[] = listaTransacoes ?? [];
+      const contas = listaContas ?? [];
+
+      this.calcularInvestimentos(contas);
       this.processarDados(transacoes);
     } catch (e) {
       console.error('Erro ao carregar dashboard', e);
@@ -96,7 +85,7 @@ export class DashboardComponent implements OnInit {
 
     this.calcularResumo(filtradas);
     this.montarUltimas(transacoes); // mantém geral
-    this.montarGrafico(filtradas);
+    this.montarContas(filtradas);
   }
 
   // 📅 FILTRO POR DATA
@@ -128,6 +117,13 @@ export class DashboardComponent implements OnInit {
     this.saldoTotal = this.totalReceitas - this.totalDespesas;
   }
 
+  // 💰 INVESTIMENTOS
+  private calcularInvestimentos(contas: ContaResponseDTO[]) {
+    this.totalInvestido = contas
+      .filter((c) => c.tipo === 'Investimento')
+      .reduce((acc, c) => acc + Number(c.saldo), 0);
+  }
+
   // 📋 ÚLTIMAS TRANSAÇÕES
   private montarUltimas(transacoes: Transacao[]) {
     this.ultimasTransacoes = [...transacoes]
@@ -135,52 +131,24 @@ export class DashboardComponent implements OnInit {
       .slice(0, 5);
   }
 
-  // 📊 GRÁFICO + RESUMO
-  private montarGrafico(transacoes: Transacao[]) {
-    const mapa: Record<string, number> = {};
-    let total = 0;
+  //  CONTAS PAGAS E NÃO PAGAS
+  private montarContas(transacoes: Transacao[]) {
+    this.contasNaoPagas = transacoes
+      .filter((t) => !t.pago)
+      .sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime());
 
-    transacoes.forEach((t) => {
-      if (t.tipo === 'DESPESA') {
-        mapa[t.categoriaNome] = (mapa[t.categoriaNome] || 0) + Number(t.valor);
+    this.contasPagas = transacoes
+      .filter((t) => t.pago)
+      .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime());
 
-        total += Number(t.valor);
-      }
-    });
+    this.contasNaoPagesTotalValor = this.contasNaoPagas.reduce(
+      (acc, t) => acc + Number(t.valor),
+      0,
+    );
 
-    const cores = [
-      '#22c55e',
-      '#ef4444',
-      '#3b82f6',
-      '#f59e0b',
-      '#8b5cf6',
-      '#06b6d4',
-    ];
-
-    const categorias = Object.keys(mapa);
-
-    this.resumoCategorias = categorias.map((nome, i) => {
-      const valor = mapa[nome];
-
-      return {
-        nome,
-        valor,
-        percentual: total > 0 ? ((valor / total) * 100).toFixed(0) : '0',
-        cor: cores[i % cores.length],
-      };
-    });
-
-    this.graficoCategorias = {
-      labels: categorias,
-      datasets: [
-        {
-          data: Object.values(mapa),
-          backgroundColor: this.resumoCategorias.map((c) => c.cor),
-          borderWidth: 0,
-        },
-      ],
-    };
-
-    this.totalDespesas = total;
+    this.contasPagasTotalValor = this.contasPagas.reduce(
+      (acc, t) => acc + Number(t.valor),
+      0,
+    );
   }
 }

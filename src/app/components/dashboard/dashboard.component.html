@@ -1,30 +1,30 @@
 <!-- eslint-disable @angular-eslint/template/elements-content -->
-<div class="p-4">
+<div class="dashboard-container">
   <!-- HEADER -->
-  <div class="flex justify-content-between align-items-center mb-4">
-    <div>
-      <h2 class="m-0">Dashboard</h2>
-      <small class="text-500">Resumo financeiro por mês</small>
+  <div class="dashboard-header">
+    <div class="header-content">
+      <h2 class="page-title">Dashboard</h2>
+      <p class="page-subtitle">Resumo financeiro por mês</p>
     </div>
 
-    <div class="flex gap-2 align-items-end mb-4">
-      <div>
-        <label class="block text-sm mb-1" for="data-inicial"
-          >Data inicial</label
-        >
+    <div class="filters-container">
+      <div class="filter-group">
+        <label for="data-inicial">Data inicial</label>
         <p-datepicker
           [(ngModel)]="dataInicial"
           dateFormat="dd/mm/yy"
           [showIcon]="true"
+          inputId="data-inicial"
         ></p-datepicker>
       </div>
 
-      <div>
-        <label class="block text-sm mb-1" for="data">Data final</label>
+      <div class="filter-group">
+        <label for="data-final">Data final</label>
         <p-datepicker
           [(ngModel)]="dataFinal"
           dateFormat="dd/mm/yy"
           [showIcon]="true"
+          inputId="data-final"
         ></p-datepicker>
       </div>
 
@@ -33,64 +33,108 @@
         label="Filtrar"
         icon="pi pi-filter"
         (click)="aplicarFiltro()"
+        class="filter-btn"
       ></button>
     </div>
   </div>
 
-  <!-- CARD PRINCIPAL -->
-  <p-card styleClass="shadow-2 border-round-xl">
-    <div class="grid">
-      <!-- GRÁFICO -->
-      <div
-        class="col-12 md:col-5 flex justify-content-center align-items-center"
-      >
-        <p-chart
-          type="doughnut"
-          [data]="graficoCategorias"
-          [options]="chartOptions"
-          style="width: 260px"
-        ></p-chart>
-      </div>
-
-      <!-- LISTA -->
-      <div class="col-12 md:col-7">
-        <div class="flex justify-content-between mb-3">
-          <h4 class="m-0">Gastos por categoria</h4>
-          <small class="text-500"
-            >Total: {{ totalDespesas | currency: "BRL" }}</small
-          >
+  <!-- CARDS PRINCIPAIS -->
+  <div class="cards-grid">
+    <!-- INVESTIMENTOS -->
+    <p-card class="metric-card">
+      <ng-template pTemplate="header">
+        <div class="card-header">
+          <span class="card-title">Investimentos</span>
         </div>
-
-        <div class="flex flex-column gap-3">
-          @for (cat of resumoCategorias; track cat.nome) {
-            <div
-              class="flex justify-content-between align-items-center p-2 border-round-lg hover:surface-100"
-            >
-              <!-- ESQUERDA -->
-              <div class="flex align-items-center gap-2">
-                <span
-                  class="border-circle"
-                  style="width: 10px; height: 10px"
-                  [style.background]="cat.cor"
-                ></span>
-
-                <span class="font-medium">
-                  {{ cat.nome }}
-                </span>
-              </div>
-
-              <!-- DIREITA -->
-              <div class="flex align-items-center gap-3">
-                <small class="text-500"> {{ cat.percentual }}% </small>
-
-                <span class="font-semibold">
-                  {{ cat.valor | currency: "BRL" }}
-                </span>
-              </div>
-            </div>
-          }
-        </div>
+      </ng-template>
+      <div class="metric-value">
+        <h3 class="text-success">{{ totalInvestido | currency: "BRL" }}</h3>
+        <p>Total investido</p>
       </div>
+    </p-card>
+
+    <!-- CONTAS NÃO PAGAS -->
+    <p-card class="metric-card">
+      <ng-template pTemplate="header">
+        <div class="card-header">
+          <span class="card-title">Contas Não Pagas</span>
+        </div>
+      </ng-template>
+      <div class="metric-value">
+        <h3 class="text-danger">
+          {{ contasNaoPagesTotalValor | currency: "BRL" }}
+        </h3>
+        <p>{{ contasNaoPagas.length }} contas pendentes</p>
+      </div>
+    </p-card>
+
+    <!-- CONTAS PAGAS -->
+    <p-card class="metric-card">
+      <ng-template pTemplate="header">
+        <div class="card-header">
+          <span class="card-title">Contas Pagas</span>
+        </div>
+      </ng-template>
+      <div class="metric-value">
+        <h3>
+          {{ contasPagasTotalValor | currency: "BRL" }}
+        </h3>
+        <p>{{ contasPagas.length }} contas pagas</p>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- CONTAS NÃO PAGAS DETALHES -->
+  <p-card class="detail-card mt-4">
+    <ng-template pTemplate="header">
+      <div class="card-header">
+        <span class="card-title">Contas Não Pagas - Detalhes</span>
+      </div>
+    </ng-template>
+    <div class="transactions-list">
+      @for (transacao of contasNaoPagas; track transacao.id) {
+        <div class="transaction-item">
+          <div class="transaction-info">
+            <span class="transaction-desc">{{ transacao.descricao }}</span>
+            <small class="transaction-meta">
+              {{ transacao.categoriaNome }} -
+              {{ transacao.data | date: "dd/MM/yyyy" }}
+            </small>
+          </div>
+          <span class="transaction-value text-danger">{{
+            transacao.valor | currency: "BRL"
+          }}</span>
+        </div>
+      } @empty {
+        <p class="empty-state">Nenhuma conta não paga no período.</p>
+      }
+    </div>
+  </p-card>
+
+  <!-- CONTAS PAGAS DETALHES -->
+  <p-card class="detail-card mt-4">
+    <ng-template pTemplate="header">
+      <div class="card-header">
+        <span class="card-title">Contas Pagas - Detalhes</span>
+      </div>
+    </ng-template>
+    <div class="transactions-list">
+      @for (transacao of contasPagas; track transacao.id) {
+        <div class="transaction-item">
+          <div class="transaction-info">
+            <span class="transaction-desc">{{ transacao.descricao }}</span>
+            <small class="transaction-meta">
+              {{ transacao.categoriaNome }} -
+              {{ transacao.data | date: "dd/MM/yyyy" }}
+            </small>
+          </div>
+          <span class="transaction-value text-success">{{
+            transacao.valor | currency: "BRL"
+          }}</span>
+        </div>
+      } @empty {
+        <p class="empty-state">Nenhuma conta paga no período.</p>
+      }
     </div>
   </p-card>
 </div>

@@ -1,0 +1,26 @@
+/* Botões de Ação */
+.btn-edit {
+  color: #1e3a8a !important;
+  background: #eff6ff !important;
+  border: 1px solid #bfdbfe !important;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: #dbeafe !important;
+    border-color: #7dd3fc !important;
+    color: #0f172a !important;
+  }
+}
+
+.btn-delete {
+  color: #dc2626 !important;
+  background: #fee2e2 !important;
+  border: 1px solid #fecaca !important;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: #fecaca !important;
+    border-color: #f87171 !important;
+    color: #991b1b !important;
+  }
+}

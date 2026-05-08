@@ -1,15 +1,26 @@
 <div class="layout">
-
   <!-- SIDEBAR DESKTOP -->
   <aside class="sidebar-desktop">
     <div class="logo">
-      <img class="brand-logo" src="assets/fincloud.png" alt="FinCloud" />
+      <img class="brand-logo" src="assets/logo_fincloud.png" alt="FinCloud" />
     </div>
 
     <p-panelMenu [model]="items"></p-panelMenu>
 
-    <div class="logout">
-      <button pButton type="button" (click)="logout()" class="p-button-text">
+    <div class="user-section">
+      <div class="user-info">
+        <i class="pi pi-user user-avatar"></i>
+        <div class="user-details">
+          <span class="user-name">{{ userName }}</span>
+        </div>
+      </div>
+
+      <button
+        pButton
+        type="button"
+        (click)="logout()"
+        class="logout-button p-button-text"
+      >
         <i class="pi pi-sign-out"></i> Sair
       </button>
     </div>
@@ -20,11 +31,12 @@
     <div class="mobile-sidebar-content">
       <p-panelMenu [model]="items"></p-panelMenu>
 
-      <button 
-        pButton 
-        type="button" 
-        (click)="logout()" 
-        class="p-button-text w-full">
+      <button
+        pButton
+        type="button"
+        (click)="logout()"
+        class="p-button-text w-full"
+      >
         <i class="pi pi-sign-out"></i> Sair
       </button>
     </div>
@@ -32,26 +44,23 @@
 
   <!-- CONTEÚDO -->
   <div class="content">
-
     <!-- TOPBAR -->
     <div class="topbar">
-
       <!-- BOTÃO MOBILE -->
-      <button 
-        pButton 
-        icon="pi pi-bars" 
+      <button
+        pButton
+        icon="pi pi-bars"
         (click)="menuOpen = true"
         aria-label="Abrir menu"
-        class="menu-mobile-btn">
-      </button>
+        class="menu-mobile-btn"
+      ></button>
 
-      <h2>FinCloud</h2>
+      <h2>Olá, {{ userName }}</h2>
     </div>
 
     <!-- PÁGINA -->
     <div class="page">
       <router-outlet></router-outlet>
     </div>
-
   </div>
 </div>

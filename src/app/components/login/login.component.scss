@@ -1,3 +1,84 @@
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #f8fafc;
+  padding: 1rem;
+}
+
+.login-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 3rem 2rem;
+  width: 100%;
+  max-width: 400px;
+  border: 1px solid #e2e8f0;
+}
+
+.logo-section {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  
+  .brand-logo {
+    max-width: 250px;
+    height: auto;
+  }
+}
+
+::ng-deep {
+  .login-container {
+    .p-inputgroup {
+      .p-inputgroup-addon {
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        color: #475569;
+      }
+      
+      .p-input {
+        border-color: #e2e8f0;
+        
+        &:focus {
+          border-color: #1e3a8a;
+          box-shadow: 0 0 0 0.2rem rgba(30, 58, 138, 0.1);
+        }
+      }
+    }
+    
+    .p-button {
+      background: #1e3a8a;
+      border-color: #1e3a8a;
+      color: #ffffff;
+      font-weight: 600;
+      padding: 0.85rem;
+      border-radius: 6px;
+      
+      &:hover {
+        background: #1a2f6d;
+        border-color: #1a2f6d;
+      }
+      
+      &:focus {
+        box-shadow: 0 0 0 0.2rem rgba(30, 58, 138, 0.25);
+      }
+    }
+  }
+}
+
+.signup-link {
+  color: #1e3a8a;
+  font-size: 0.9rem;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  
+  &:hover {
+    color: #1a2f6d;
+    text-decoration: underline;
+  }
+}
+
 .login-card:focus,
 .login-card *:focus {
   outline: none;

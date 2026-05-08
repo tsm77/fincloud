@@ -3,12 +3,10 @@
 <!-- eslint-disable @angular-eslint/template/interactive-supports-focus -->
 <p-toast position="top-right"></p-toast>
 
-<div
-  class="flex align-items-center justify-content-center min-h-screen bg-gray-100"
->
-  <div class="surface-card p-5 shadow-4 border-round w-full md:w-6 lg:w-4">
-    <div class="text-center">
-      <img src="assets/fincloud.png" class="w-20rem" alt="FinCloud" />
+<div class="login-container">
+  <div class="login-card">
+    <div class="logo-section">
+      <img src="assets/logo_fincloud.png" class="brand-logo" alt="FinCloud" />
     </div>
 
     <form
@@ -59,7 +57,7 @@
       ></button>
 
       <div class="text-center">
-        <a class="text-primary text-sm cursor-pointer" (click)="showDialog()"
+        <a class="signup-link cursor-pointer" (click)="showDialog()"
           >Cadastrar-se</a
         >
       </div>

@@ -2,19 +2,14 @@
 <p-confirmDialog></p-confirmDialog>
 
 <div class="page">
-
   <!-- HEADER -->
   <div class="page-header">
-    
     <div class="header-left">
       <h2 class="title">Categorias</h2>
-      <p class="subtitle">
-        Crie e gerencie as categorias de entrada e saída.
-      </p>
+      <p class="subtitle">Crie e gerencie as categorias de entrada e saída.</p>
     </div>
 
     <div class="header-right">
-
       <!-- BUSCA -->
       <span class="p-input-icon-left search">
         <i class="pi pi-search"></i>
@@ -35,7 +30,6 @@
         (click)="abrirNova()"
         aria-label="Nova categoria"
       ></button>
-
     </div>
   </div>
 
@@ -49,7 +43,6 @@
       [rowsPerPageOptions]="[10, 20, 50]"
       responsiveLayout="scroll"
     >
-
       <!-- HEADER -->
       <ng-template pTemplate="header">
         <tr>
@@ -85,18 +78,18 @@
             <button
               pButton
               icon="pi pi-pencil"
-              class="p-button-text"
+              class="p-button-text btn-edit"
               (click)="abrirEdicao(cat)"
-              aria-label="Editar categoria">
-            </button>
+              aria-label="Editar categoria"
+            ></button>
 
             <button
               pButton
               icon="pi pi-trash"
-              class="p-button-text p-button-danger"
+              class="p-button-text btn-delete"
               (click)="confirmarRemocao(cat)"
-              aria-label="Excluir categoria">
-            </button>
+              aria-label="Excluir categoria"
+            ></button>
           </td>
         </tr>
       </ng-template>
@@ -108,9 +101,7 @@
             <div class="empty">
               <i class="pi pi-inbox empty-icon"></i>
 
-              <div class="empty-title">
-                Nenhuma categoria ainda
-              </div>
+              <div class="empty-title">Nenhuma categoria ainda</div>
 
               <div class="empty-subtitle">
                 Comece criando uma nova categoria.
@@ -120,13 +111,12 @@
                 pButton
                 icon="pi pi-plus"
                 label="Nova Categoria"
-                (click)="abrirNova()">
-              </button>
+                (click)="abrirNova()"
+              ></button>
             </div>
           </td>
         </tr>
       </ng-template>
-
     </p-table>
   </div>
 </div>
@@ -142,9 +132,7 @@
   [style]="{ width: '520px', maxWidth: '95vw' }"
   (onHide)="fecharDialog()"
 >
-
   <form class="dialog-form" [formGroup]="form">
-
     <!-- NOME -->
     <div class="field">
       <label for="nome">Nome</label>
@@ -155,9 +143,7 @@
         placeholder="Nome da categoria"
       />
       @if (form.controls.nome.touched && form.controls.nome.invalid) {
-        <small class="error">
-          Informe um nome (2–40 caracteres).
-        </small>
+        <small class="error"> Informe um nome (2–40 caracteres). </small>
       }
     </div>
 
@@ -165,13 +151,13 @@
     <div class="field">
       <label for="tipo">Tipo</label>
       <div class="tipo-row">
-
         <p-radioButton
           inputId="receita"
           name="tipo"
           id="tipo"
           value="RECEITA"
-          formControlName="tipo">
+          formControlName="tipo"
+        >
         </p-radioButton>
         <label for="receita" class="tipo-label">Receita</label>
 
@@ -179,10 +165,10 @@
           inputId="despesa"
           name="tipo"
           value="DESPESA"
-          formControlName="tipo">
+          formControlName="tipo"
+        >
         </p-radioButton>
         <label for="despesa" class="tipo-label">Despesa</label>
-
       </div>
     </div>
 
@@ -198,17 +184,15 @@
             [class.selected]="form.controls.cor.value === c"
             [style.background]="c"
             (click)="selecionarCor(c)"
-            aria-label="Selecionar cor">
-
+            aria-label="Selecionar cor"
+          >
             @if (form.controls.cor.value === c) {
               <i class="pi pi-check"></i>
             }
-
           </button>
         }
       </div>
     </div>
-
   </form>
 
   <!-- FOOTER -->
@@ -217,15 +201,14 @@
       pButton
       class="p-button-text"
       label="Cancelar"
-      (click)="fecharDialog()">
-    </button>
+      (click)="fecharDialog()"
+    ></button>
 
     <button
       pButton
       label="Salvar"
       [disabled]="loading()"
-      (click)="salvar()">
-    </button>
+      (click)="salvar()"
+    ></button>
   </ng-template>
-
 </p-dialog>

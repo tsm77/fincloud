@@ -1,5 +1,7 @@
 .page {
   padding: 24px;
+  width: 100%;
+  max-width: 100%;
 }
 
 /* ================= HEADER ================= */
@@ -35,6 +37,11 @@
   gap: 12px;
 }
 
+.search {
+  width: auto;
+  flex: 1 1 auto;
+}
+
 .search input {
   width: 240px;
 }
@@ -45,6 +52,29 @@
   border-radius: 12px;
   padding: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.table-wrapper .p-datatable-wrapper,
+.table-wrapper table,
+.table-wrapper .p-table,
+.table-wrapper .p-datatable-scrollable-view {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.p-datatable-responsive .p-datatable-scrollable-body table,
+.p-datatable-responsive .p-datatable-scrollable-header table {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.p-datatable-responsive table th,
+.p-datatable-responsive table td {
+  white-space: normal !important;
 }
 
 /* ================= TAGS ================= */
@@ -95,6 +125,33 @@
   margin-bottom: 12px;
 }
 
+/* Botões de Ação */
+:host ::ng-deep .btn-edit {
+  color: #1e3a8a !important;
+  background: #eff6ff !important;
+  border: 1px solid #bfdbfe !important;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: #dbeafe !important;
+    border-color: #7dd3fc !important;
+    color: #0f172a !important;
+  }
+}
+
+:host ::ng-deep .btn-delete {
+  color: #dc2626 !important;
+  background: #fee2e2 !important;
+  border: 1px solid #fecaca !important;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: #fecaca !important;
+    border-color: #f87171 !important;
+    color: #991b1b !important;
+  }
+}
+
 /* ================= RESPONSIVO ================= */
 @media (max-width: 768px) {
 
@@ -110,9 +167,18 @@
   .header-right {
     flex-direction: column;
     align-items: stretch;
+    width: 100%;
+  }
+
+  .search {
+    width: 100%;
   }
 
   .search input {
+    width: 100%;
+  }
+
+  .header-right > button {
     width: 100%;
   }
 
@@ -120,9 +186,57 @@
     width: 100%;
   }
 
-  /* tabela scroll horizontal */
   .table-wrapper {
+    overflow-x: hidden;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .table-wrapper .p-datatable-wrapper,
+  .table-wrapper table,
+  .table-wrapper .p-table,
+  .table-wrapper .p-datatable-scrollable-view {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .p-table .p-datatable-table,
+  .p-table table {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .p-table .p-datatable-thead th,
+  .p-table .p-datatable-tbody td {
+    white-space: normal !important;
+  }
+
+  .p-paginator {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  .p-datatable-responsive .p-datatable-wrapper,
+  .p-datatable-responsive .p-datatable-scrollable-view {
     overflow-x: auto;
+  }
+
+  .p-table tbody tr td {
+    word-break: break-word;
+    white-space: normal !important;
+  }
+
+  html,
+  body,
+  app-root,
+  .layout,
+  .content,
+  .page {
+    max-width: 100vw;
+    overflow-x: hidden;
   }
 
 }

@@ -310,6 +310,16 @@ export class TransacoesComponent {
     this.items.removeAt(index);
   }
 
+  toggleParcelado(index: number) {
+    const item = this.items.at(index);
+    const parcelado = item.get('parcelado')?.value;
+
+    item.patchValue({
+      parcelado: !parcelado,
+      numeroParcelas: parcelado ? 1 : item.get('numeroParcelas')?.value || 1,
+    });
+  }
+
   abrirNova() {
     this.editandoId = null;
     this.form.reset();
