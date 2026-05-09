@@ -59,7 +59,10 @@
 
     <div class="summary-card">
       <span>Saldo do periodo</span>
-      <strong [class.positive]="saldoPeriodo >= 0" [class.negative]="saldoPeriodo < 0">
+      <strong
+        [class.positive]="saldoPeriodo >= 0"
+        [class.negative]="saldoPeriodo < 0"
+      >
         {{ saldoPeriodo | currency: "BRL" }}
       </strong>
     </div>
@@ -144,7 +147,10 @@
         <i class="pi pi-chart-pie"></i>
       </span>
       <h3>Nenhuma movimentacao encontrada</h3>
-      <p>Altere o periodo ou cadastre receitas ou despesas para visualizar os relatorios.</p>
+      <p>
+        Altere o periodo ou cadastre receitas ou despesas para visualizar os
+        relatorios.
+      </p>
     </div>
   }
 </section>
