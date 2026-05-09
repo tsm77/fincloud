@@ -1,85 +1,235 @@
-.login-container {
+.login-page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(360px, 0.9fr) minmax(420px, 1.1fr);
+  background: #f6f8fb;
+}
+
+.brand-panel {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  background: #f8fafc;
-  padding: 1rem;
+  padding: 40px;
+  background: #ffffff;
+  border-right: 1px solid #e5e7eb;
+}
+
+.brand-content {
+  width: min(420px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.brand-logo {
+  width: 190px;
+  height: auto;
+}
+
+.eyebrow {
+  color: #1e3a8a;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.brand-content h1 {
+  margin: 8px 0 0;
+  color: #0f172a;
+  font-size: 42px;
+  line-height: 1;
+}
+
+.brand-content p,
+.card-header p {
+  margin: 8px 0 0;
+  color: #64748b;
+}
+
+.login-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
 }
 
 .login-card {
+  width: min(430px, 100%);
+  padding: 28px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 3rem 2rem;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.login-icon {
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: #eff6ff;
+  color: #1e3a8a;
+}
+
+.card-header h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 26px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field label {
+  color: #475569;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.field .p-input-icon-left,
+.field input {
   width: 100%;
-  max-width: 400px;
-  border: 1px solid #e2e8f0;
 }
 
-.logo-section {
-  text-align: center;
-  margin-bottom: 2.5rem;
-  
-  .brand-logo {
-    max-width: 250px;
-    height: auto;
-  }
+.field .p-input-icon-left {
+  display: block;
+  position: relative;
 }
 
-::ng-deep {
-  .login-container {
-    .p-inputgroup {
-      .p-inputgroup-addon {
-        background: #f1f5f9;
-        border: 1px solid #e2e8f0;
-        color: #475569;
-      }
-      
-      .p-input {
-        border-color: #e2e8f0;
-        
-        &:focus {
-          border-color: #1e3a8a;
-          box-shadow: 0 0 0 0.2rem rgba(30, 58, 138, 0.1);
-        }
-      }
-    }
-    
-    .p-button {
-      background: #1e3a8a;
-      border-color: #1e3a8a;
-      color: #ffffff;
-      font-weight: 600;
-      padding: 0.85rem;
-      border-radius: 6px;
-      
-      &:hover {
-        background: #1a2f6d;
-        border-color: #1a2f6d;
-      }
-      
-      &:focus {
-        box-shadow: 0 0 0 0.2rem rgba(30, 58, 138, 0.25);
-      }
-    }
-  }
+.field .p-input-icon-left > i {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  z-index: 1;
+  color: #64748b;
+  transform: translateY(-50%);
+}
+
+.field input {
+  min-height: 44px;
+  padding-left: 42px;
+}
+
+.field-error,
+.inline-error {
+  color: #dc2626;
+  font-size: 12px;
+}
+
+.inline-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  background: #fff1f2;
+}
+
+.login-btn {
+  width: 100%;
+  justify-content: center;
+  min-height: 44px;
+}
+
+.signup-row {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  color: #64748b;
+  font-size: 14px;
 }
 
 .signup-link {
+  border: 0;
+  background: transparent;
   color: #1e3a8a;
-  font-size: 0.9rem;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.2s ease;
-  
-  &:hover {
-    color: #1a2f6d;
-    text-decoration: underline;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  padding: 0;
+}
+
+.signup-link:hover {
+  text-decoration: underline;
+}
+
+:host ::ng-deep .login-card {
+  .p-inputtext {
+    border-radius: 8px;
   }
 }
 
-.login-card:focus,
-.login-card *:focus {
-  outline: none;
+:host ::ng-deep .signup-dialog {
+  .p-dialog-header {
+    padding: 22px 22px 10px;
+  }
+
+  .p-dialog-title {
+    color: #0f172a;
+    font-size: 22px;
+    font-weight: 800;
+  }
+
+  .p-dialog-content {
+    padding: 10px 22px 22px;
+  }
+
+  .p-dialog-header-close {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #1e3a8a;
+    color: #ffffff;
+  }
+}
+
+@media (max-width: 860px) {
+  .login-page {
+    grid-template-columns: 1fr;
+  }
+
+  .brand-panel {
+    min-height: auto;
+    padding: 28px 24px 10px;
+    border-right: 0;
+    background: #f6f8fb;
+  }
+
+  .brand-content {
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+  }
+
+  .brand-logo {
+    width: 150px;
+  }
+
+  .brand-content h1,
+  .brand-content p {
+    display: none;
+  }
+
+  .login-panel {
+    align-items: flex-start;
+  }
 }

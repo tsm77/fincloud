@@ -1,8 +1,101 @@
-:host ::ng-deep .p-floatlabel > label {
-  left: 0.75rem; /* alinha melhor com o inputgroup */
+.signup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-:host ::ng-deep .p-inputgroup .p-inputtext,
-:host ::ng-deep .p-inputgroup .p-password-input {
-  height: 44px;
+.dialog-intro {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.dialog-icon {
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: #eff6ff;
+  color: #1e3a8a;
+}
+
+.dialog-intro strong {
+  color: #0f172a;
+  font-size: 15px;
+}
+
+.dialog-intro p {
+  margin: 3px 0 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field label {
+  color: #475569;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.field .p-input-icon-left,
+.field input {
+  width: 100%;
+}
+
+.field .p-input-icon-left {
+  display: block;
+  position: relative;
+}
+
+.field .p-input-icon-left > i {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  z-index: 1;
+  color: #64748b;
+  transform: translateY(-50%);
+}
+
+.field input {
+  min-height: 42px;
+  padding-left: 42px;
+}
+
+.field-error {
+  color: #dc2626;
+  font-size: 12px;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 6px;
+}
+
+.dialog-actions button {
+  min-width: 116px;
+  justify-content: center;
+}
+
+:host ::ng-deep .signup-form .p-inputtext {
+  border-radius: 8px;
+}
+
+@media (max-width: 560px) {
+  .dialog-actions {
+    flex-direction: column-reverse;
+  }
 }

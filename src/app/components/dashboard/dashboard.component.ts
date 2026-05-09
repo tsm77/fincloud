@@ -120,8 +120,8 @@ export class DashboardComponent implements OnInit {
   // 💰 INVESTIMENTOS
   private calcularInvestimentos(contas: ContaResponseDTO[]) {
     this.totalInvestido = contas
-      .filter((c) => c.tipo === 'Investimento')
-      .reduce((acc, c) => acc + Number(c.saldo), 0);
+      .filter((conta) => this.isContaInvestimento(conta))
+      .reduce((acc, conta) => acc + this.getSaldoConta(conta), 0);
   }
 
   // 📋 ÚLTIMAS TRANSAÇÕES
@@ -133,11 +133,13 @@ export class DashboardComponent implements OnInit {
 
   //  CONTAS PAGAS E NÃO PAGAS
   private montarContas(transacoes: Transacao[]) {
-    this.contasNaoPagas = transacoes
+    const despesas = transacoes.filter((t) => this.isDespesa(t));
+
+    this.contasNaoPagas = despesas
       .filter((t) => !t.pago)
       .sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime());
 
-    this.contasPagas = transacoes
+    this.contasPagas = despesas
       .filter((t) => t.pago)
       .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime());
 
@@ -150,5 +152,24 @@ export class DashboardComponent implements OnInit {
       (acc, t) => acc + Number(t.valor),
       0,
     );
+  }
+
+  private isDespesa(transacao: Transacao): boolean {
+    return transacao.tipo === 'DESPESA';
+  }
+
+  private isContaInvestimento(conta: ContaResponseDTO): boolean {
+    return this.normalizarTexto(conta.tipo).includes('INVEST');
+  }
+
+  private getSaldoConta(conta: ContaResponseDTO): number {
+    return Number(conta.saldo ?? conta.saldoInicial ?? 0);
+  }
+
+  private normalizarTexto(valor: unknown): string {
+    return String(valor ?? '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toUpperCase();
   }
 }

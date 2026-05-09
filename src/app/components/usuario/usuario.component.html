@@ -1,75 +1,85 @@
-<!-- eslint-disable @angular-eslint/template/elements-content -->
-<form [formGroup]="formUsuario">
-  <div class="mb-3">
-    <p-inputgroup class="w-full mt-5 mb-3">
-      <p-inputgroup-addon>
-        <i class="pi pi-user"></i>
-      </p-inputgroup-addon>
-      <p-floatlabel>
-        <input
-          pInputText
-          id="nome"
-          pInputText
-          pSize="large"
-          formControlName="nome"
-        />
-        <label for="nome">Nome</label>
-      </p-floatlabel>
-    </p-inputgroup>
-  </div>
-  <div class="mt-5">
-    <p-inputgroup class="w-full mb-3">
-      <p-inputgroup-addon>
-        <i class="pi pi-inbox"></i>
-      </p-inputgroup-addon>
-      <p-floatlabel>
-        <input
-          pInputText
-          id="email"
-          pInputText
-          pSize="large"
-          formControlName="email"
-        />
-        <label for="email">Email</label>
-      </p-floatlabel>
-    </p-inputgroup>
-  </div>
-  <div class="mt-5">
-    <p-inputgroup>
-      <p-inputgroup-addon>
-        <i class="pi pi-lock"></i>
-      </p-inputgroup-addon>
-      <p-floatlabel>
-        <input
-          pInputText
-          id="senha"
-          pInputText
-          formControlName="senha"
-          pSize="large"
-          class="w-full"
-          required
-          type="password"
-        />
-        <label for="senha">Senha</label>
-      </p-floatlabel>
-    </p-inputgroup>
+<form [formGroup]="formUsuario" class="signup-form">
+  <div class="dialog-intro">
+    <span class="dialog-icon">
+      <i class="pi pi-user-plus"></i>
+    </span>
+    <div>
+      <strong>Cadastre seu acesso</strong>
+      <p>Informe seus dados para criar uma nova conta.</p>
+    </div>
   </div>
 
-  <div class="flex justify-content-end gap-3 mt-4">
+  <div class="field">
+    <label for="nome">Nome</label>
+    <span class="p-input-icon-left">
+      <i class="pi pi-user"></i>
+      <input
+        pInputText
+        id="nome"
+        type="text"
+        formControlName="nome"
+        placeholder="Seu nome"
+      />
+    </span>
+    @if (formUsuario.controls.nome.touched && formUsuario.controls.nome.invalid) {
+      <small class="field-error">Informe um nome com pelo menos 2 caracteres.</small>
+    }
+  </div>
+
+  <div class="field">
+    <label for="email-cadastro">Email</label>
+    <span class="p-input-icon-left">
+      <i class="pi pi-inbox"></i>
+      <input
+        pInputText
+        id="email-cadastro"
+        type="email"
+        formControlName="email"
+        placeholder="seuemail@exemplo.com"
+      />
+    </span>
+    @if (formUsuario.controls.email.touched && formUsuario.controls.email.invalid) {
+      <small class="field-error">Informe um email valido.</small>
+    }
+  </div>
+
+  <div class="field">
+    <label for="senha-cadastro">Senha</label>
+    <span class="p-input-icon-left">
+      <i class="pi pi-lock"></i>
+      <input
+        pInputText
+        id="senha-cadastro"
+        type="password"
+        formControlName="senha"
+        placeholder="Sua senha"
+      />
+    </span>
+    @if (formUsuario.controls.senha.touched && formUsuario.controls.senha.invalid) {
+      <small class="field-error">A senha deve ter pelo menos 4 caracteres.</small>
+    }
+  </div>
+
+  <div class="dialog-actions">
     <button
       pButton
-      label="Cancel"
-      icon="pi pi-times"
-      severity="secondary"
-      outlined
-      (click)="onCancel()"
-    ></button>
-    <button
-      pButton
-      label="Save"
-      icon="pi pi-check"
       type="button"
+      class="p-button-outlined"
+      icon="pi pi-times"
+      (click)="onCancel()"
+    >
+      <span>Cancelar</span>
+    </button>
+
+    <button
+      pButton
+      type="button"
+      icon="pi pi-check"
+      [loading]="loading()"
+      [disabled]="loading() || formUsuario.invalid"
       (click)="onSave()"
-    ></button>
+    >
+      <span>Salvar</span>
+    </button>
   </div>
 </form>

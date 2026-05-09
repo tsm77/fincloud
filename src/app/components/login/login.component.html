@@ -1,74 +1,101 @@
-<!-- eslint-disable @angular-eslint/template/click-events-have-key-events -->
-<!-- eslint-disable @angular-eslint/template/elements-content -->
-<!-- eslint-disable @angular-eslint/template/interactive-supports-focus -->
 <p-toast position="top-right"></p-toast>
 
-<div class="login-container">
-  <div class="login-card">
-    <div class="logo-section">
+<main class="login-page">
+  <section class="brand-panel" aria-label="FinCloud">
+    <div class="brand-content">
       <img src="assets/logo_fincloud.png" class="brand-logo" alt="FinCloud" />
-    </div>
-
-    <form
-      [formGroup]="form"
-      (ngSubmit)="onSubmit()"
-      class="flex flex-column gap-3"
-    >
-      <p-inputgroup class="w-full mb-3">
-        <p-inputgroup-addon>
-          <i class="pi pi-inbox"></i>
-        </p-inputgroup-addon>
-        <p-floatlabel>
-          <input
-            pInputText
-            id="email"
-            pInputText
-            formControlName="email"
-            pSize="large"
-          />
-          <label for="email">Email</label>
-        </p-floatlabel>
-      </p-inputgroup>
-
-      <p-inputgroup>
-        <p-inputgroup-addon>
-          <i class="pi pi-lock"></i>
-        </p-inputgroup-addon>
-        <p-floatlabel>
-          <input
-            pInputText
-            id="password"
-            pInputText
-            type="password"
-            formControlName="password"
-            pSize="large"
-            class="w-full"
-          />
-          <label for="password">Senha</label>
-        </p-floatlabel>
-      </p-inputgroup>
-
-      <button
-        pButton
-        type="submit"
-        label="Entrar"
-        class="w-full"
-        [loading]="loading()"
-      ></button>
-
-      <div class="text-center">
-        <a class="signup-link cursor-pointer" (click)="showDialog()"
-          >Cadastrar-se</a
-        >
+      <div>
+        <span class="eyebrow">Painel financeiro</span>
+        <h1>FinCloud</h1>
+        <p>Entre para acompanhar suas contas, transacoes e relatorios.</p>
       </div>
-    </form>
-  </div>
-</div>
+    </div>
+  </section>
+
+  <section class="login-panel">
+    <div class="login-card">
+      <div class="card-header">
+        <span class="login-icon">
+          <i class="pi pi-lock"></i>
+        </span>
+        <div>
+          <h2>Entrar</h2>
+          <p>Acesse sua conta FinCloud.</p>
+        </div>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="login-form">
+        <div class="field">
+          <label for="email">Email</label>
+          <span class="p-input-icon-left">
+            <i class="pi pi-inbox"></i>
+            <input
+              pInputText
+              id="email"
+              type="email"
+              formControlName="email"
+              placeholder="seuemail@exemplo.com"
+            />
+          </span>
+          @if (form.controls.email.touched && form.controls.email.invalid) {
+            <small class="field-error">Informe um email valido.</small>
+          }
+        </div>
+
+        <div class="field">
+          <label for="password">Senha</label>
+          <span class="p-input-icon-left">
+            <i class="pi pi-lock"></i>
+            <input
+              pInputText
+              id="password"
+              type="password"
+              formControlName="password"
+              placeholder="Sua senha"
+            />
+          </span>
+          @if (form.controls.password.touched && form.controls.password.invalid) {
+            <small class="field-error">A senha deve ter pelo menos 4 caracteres.</small>
+          }
+        </div>
+
+        @if (showInlineError()) {
+          <div class="inline-error">
+            <i class="pi pi-exclamation-circle"></i>
+            <span>Usuario ou senha invalidos.</span>
+          </div>
+        }
+
+        <button
+          pButton
+          type="submit"
+          icon="pi pi-sign-in"
+          class="login-btn"
+          [loading]="loading()"
+          [disabled]="loading() || form.invalid"
+        >
+          <span>Entrar</span>
+        </button>
+
+        <div class="signup-row">
+          <span>Ainda nao tem conta?</span>
+          <button type="button" class="signup-link" (click)="showDialog()">
+            Criar conta
+          </button>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>
+
 <p-dialog
   [(visible)]="visible"
   [modal]="true"
-  [style]="{ width: '32rem' }"
+  [style]="{ width: '34rem', maxWidth: '95vw' }"
   header="Criar conta"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="signup-dialog"
   (onHide)="hideDialog()"
 >
   <app-usuario (close)="visible = false"></app-usuario>

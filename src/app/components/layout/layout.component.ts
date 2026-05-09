@@ -1,5 +1,10 @@
 import { Component, OnInit, computed, inject } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import {
+  Router,
+  RouterLink,
+  RouterLinkActive,
+  RouterOutlet,
+} from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 
@@ -16,7 +21,13 @@ interface SidebarItem {
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, ButtonModule, ImportsModule],
+  imports: [
+    RouterOutlet,
+    RouterLink,
+    RouterLinkActive,
+    ButtonModule,
+    ImportsModule,
+  ],
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.scss'],
 })
@@ -67,11 +78,6 @@ export class LayoutComponent implements OnInit {
       label: 'Relatorios',
       icon: 'pi pi-chart-bar',
       route: '/relatorios',
-    },
-    {
-      label: 'Meu usuario',
-      icon: 'pi pi-user-edit',
-      route: '/usuarios',
     },
   ];
 

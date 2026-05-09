@@ -93,7 +93,17 @@ export class ContasComponent implements OnInit {
     );
   });
 
-  readonly salvarDisabled = computed(() => this.saving() || this.form.invalid);
+  readonly contasAtivasTotal = computed(
+    () => this.contas().filter((c) => !c.arquivada).length,
+  );
+
+  readonly saldoTotal = computed(() =>
+    this.contas()
+      .filter((c) => !c.arquivada)
+      .reduce((total, conta) => total + Number(conta.saldo ?? 0), 0),
+  );
+
+  readonly saldoPositivo = computed(() => this.saldoTotal() >= 0);
 
   /** =========================
    *  FORM
@@ -268,5 +278,20 @@ export class ContasComponent implements OnInit {
     ];
 
     menu.toggle(event);
+  }
+
+  getContaIcon(tipo: TipoConta): string {
+    const normalizado = tipo
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
+
+    if (normalizado.includes('credito')) return 'pi pi-credit-card';
+    if (normalizado.includes('invest')) return 'pi pi-chart-line';
+    if (normalizado.includes('carteira')) return 'pi pi-wallet';
+    if (normalizado.includes('poup')) return 'pi pi-money-bill';
+    if (normalizado.includes('caixa')) return 'pi pi-box';
+
+    return 'pi pi-building-columns';
   }
 }

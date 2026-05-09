@@ -70,6 +70,16 @@ export class CategoriasComponent {
     );
   });
 
+  readonly totalCategorias = computed(() => this.categorias().length);
+
+  readonly totalReceitas = computed(
+    () => this.categorias().filter((c) => c.tipo === 'RECEITA').length,
+  );
+
+  readonly totalDespesas = computed(
+    () => this.categorias().filter((c) => c.tipo === 'DESPESA').length,
+  );
+
   constructor() {
     // carrega ao entrar
     effect(() => {

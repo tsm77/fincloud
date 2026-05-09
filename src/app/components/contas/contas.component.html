@@ -1,139 +1,197 @@
 <!-- eslint-disable @angular-eslint/template/label-has-associated-control -->
 <!-- eslint-disable @angular-eslint/template/elements-content -->
-<!-- HEADER -->
-<div class="flex justify-content-between align-items-center mb-4">
-  <div>
-    <h2 class="m-0">Contas</h2>
-    <small class="text-500">Gerencie suas contas financeiras</small>
+<p-toast></p-toast>
+
+<section class="contas-page">
+  <header class="page-header">
+    <div class="title-block">
+      <span class="eyebrow">Carteira</span>
+      <h2>Contas</h2>
+      <p>Gerencie suas contas financeiras e acompanhe seus saldos.</p>
+    </div>
+
+    <button
+      pButton
+      type="button"
+      icon="pi pi-plus"
+      label="Nova conta"
+      class="new-account-btn"
+      (click)="abrirModal()"
+    ></button>
+  </header>
+
+  <div class="summary-row">
+    <div class="summary-card balance-card">
+      <span class="summary-label">Saldo total</span>
+      <strong
+        class="summary-value"
+        [class.negative]="!saldoPositivo()"
+      >
+        {{ saldoTotal() | currency: "BRL" }}
+      </strong>
+    </div>
+
+    <div class="summary-card">
+      <span class="summary-label">Contas ativas</span>
+      <strong class="summary-value">{{ contasAtivasTotal() }}</strong>
+    </div>
+
+    <div class="search-card">
+      <span class="p-input-icon-left">
+        <i class="pi pi-search"></i>
+        <input
+          pInputText
+          type="text"
+          placeholder="Buscar por nome ou tipo"
+          [value]="query()"
+          (input)="query.set(($any($event.target).value ?? '').toString())"
+        />
+      </span>
+    </div>
   </div>
 
-  <p-button
-    icon="pi pi-plus"
-    label="Nova Conta"
-    (onClick)="abrirModal()"
-  ></p-button>
-</div>
+  <p-menu
+    #menu
+    [popup]="true"
+    [model]="menuItemsSelecionado"
+    appendTo="body"
+  ></p-menu>
 
-<!-- MENU GLOBAL -->
-<p-menu
-  #menu
-  [popup]="true"
-  [model]="menuItemsSelecionado"
-  appendTo="body"
-></p-menu>
+  @if (loadingList()) {
+    <div class="accounts-grid">
+      @for (item of [1, 2, 3]; track item) {
+        <div class="account-skeleton"></div>
+      }
+    </div>
+  } @else if (contasFiltradas().length) {
+    <div class="accounts-grid">
+      @for (c of contasFiltradas(); track c.id) {
+        <p-card styleClass="conta-card">
+          <div class="card-top">
+            <div class="account-main">
+              <span class="account-icon">
+                <i [class]="getContaIcon(c.tipo)"></i>
+              </span>
 
-<!-- GRID -->
-<div class="grid">
-  @for (c of contasFiltradas(); track c.id) {
-    <div class="col-12 md:col-6 lg:col-4">
-      <p-card styleClass="conta-card">
-        <!-- HEADER -->
-        <div class="flex justify-content-between align-items-center">
-          <!-- INFO -->
-          <div class="flex align-items-center gap-3">
-            <div class="icon-box">
-              <i class="pi pi-wallet"></i>
-            </div>
-
-            <div>
-              <div class="font-semibold text-lg">
-                {{ c.nome }}
+              <div class="account-title">
+                <strong>{{ c.nome }}</strong>
+                <span>{{ c.tipo }}</span>
               </div>
-
-              <p-chip [label]="c.tipo" styleClass="text-xs mt-1"></p-chip>
             </div>
+
+            <button
+              pButton
+              type="button"
+              icon="pi pi-ellipsis-v"
+              class="p-button-text p-button-rounded menu-btn"
+              aria-label="Abrir acoes da conta"
+              (click)="abrirMenu($event, c, menu)"
+            ></button>
           </div>
 
-          <!-- BOTÃO MENU -->
-          <button
-            pButton
-            icon="pi pi-ellipsis-v"
-            class="p-button-text p-button-rounded menu-btn"
-            (click)="abrirMenu($event, c, menu)"
-          ></button>
-        </div>
-
-        <!-- DIVIDER -->
-        <div class="divider"></div>
-
-        <!-- SALDO -->
-        <div class="saldo-container">
-          <span class="label">Saldo atual</span>
-
-          <div
-            class="valor"
-            [ngClass]="{
-              positivo: c.saldo >= 0,
-              negativo: c.saldo < 0,
-            }"
-          >
-            {{ c.saldo | currency: "BRL" }}
+          <div class="card-balance">
+            <span>Saldo atual</span>
+            <strong
+              [class.positive]="c.saldo >= 0"
+              [class.negative]="c.saldo < 0"
+            >
+              {{ c.saldo | currency: "BRL" }}
+            </strong>
           </div>
-        </div>
-      </p-card>
+        </p-card>
+      }
+    </div>
+  } @else {
+    <div class="empty-state">
+      <span class="empty-icon">
+        <i class="pi pi-wallet"></i>
+      </span>
+      <h3>Nenhuma conta encontrada</h3>
+      <p>Crie uma nova conta ou ajuste sua busca para ver os resultados.</p>
+      <button
+        pButton
+        type="button"
+        icon="pi pi-plus"
+        label="Nova conta"
+        (click)="abrirModal()"
+      ></button>
     </div>
   }
-</div>
+</section>
 
 <p-dialog
-  header="Nova Conta"
+  [header]="editandoId ? 'Editar conta' : 'Nova conta'"
   [visible]="modalNovaConta()"
   (visibleChange)="modalNovaConta.set($event)"
   [modal]="true"
-  [style]="{ width: '420px' }"
+  [style]="{ width: '440px', maxWidth: '94vw' }"
   [draggable]="false"
   [resizable]="false"
 >
-  <form [formGroup]="form" class="flex flex-column gap-3 mt-2">
-    <!-- NOME -->
-    <div>
-      <label class="block mb-2">Nome</label>
-      <input
-        pInputText
-        formControlName="nome"
-        class="w-full"
-        placeholder="Ex: Nubank"
-      />
+  <form [formGroup]="form" class="account-form">
+    <div class="dialog-intro">
+      <span class="dialog-icon">
+        <i class="pi pi-wallet"></i>
+      </span>
+      <div>
+        <strong>{{ editandoId ? "Atualizar conta" : "Cadastrar conta" }}</strong>
+        <p>Informe os dados principais da conta financeira.</p>
+      </div>
     </div>
 
-    <!-- TIPO -->
-    <div>
-      <label class="block mb-2">Tipo</label>
+    <div class="field">
+      <label for="nome">Nome</label>
+      <input
+        pInputText
+        id="nome"
+        formControlName="nome"
+        placeholder="Ex: Nubank"
+      />
+      @if (form.controls.nome.touched && form.controls.nome.invalid) {
+        <small class="field-error">Informe um nome com pelo menos 2 caracteres.</small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="tipo">Tipo</label>
       <p-dropdown
+        inputId="tipo"
         [options]="tipos"
         optionLabel="label"
         optionValue="value"
         formControlName="tipo"
-        class="w-full"
+        appendTo="body"
       ></p-dropdown>
     </div>
 
-    <!-- SALDO -->
-    <div>
-      <label class="block mb-2">Saldo inicial</label>
+    <div class="field">
+      <label for="saldoInicial">Saldo inicial</label>
       <p-inputNumber
+        inputId="saldoInicial"
         formControlName="saldoInicial"
         mode="currency"
         currency="BRL"
         locale="pt-BR"
-        class="w-full"
       ></p-inputNumber>
     </div>
 
-    <!-- AÇÕES -->
-    <div class="flex justify-content-end gap-2 mt-3">
+    <div class="dialog-actions">
       <button
         pButton
+        type="button"
         label="Cancelar"
-        class="p-button-text"
-        (click)="modalNovaConta.set(false)"
+        class="p-button-outlined"
+        (click)="cancelarModal()"
       ></button>
 
       <button
         pButton
+        type="button"
         label="Salvar"
+        icon="pi pi-check"
+        [loading]="saving()"
+        [disabled]="saving() || form.invalid"
         (click)="salvarConta()"
-        [disabled]="form.invalid"
       ></button>
     </div>
   </form>

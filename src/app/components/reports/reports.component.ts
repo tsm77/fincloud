@@ -15,6 +15,7 @@ interface Transacao {
 
 interface ResumoCategoria {
   nome: string;
+  tipo: 'RECEITA' | 'DESPESA';
   valor: number;
   percentual: string;
   cor: string;
@@ -33,13 +34,17 @@ export class ReportsComponent implements OnInit {
   // 📊 GRÁFICO
   graficoCategorias: any;
   resumoCategorias: ResumoCategoria[] = [];
+  totalReceitas = 0;
   totalDespesas = 0;
+  saldoPeriodo = 0;
+  totalMovimentado = 0;
 
   // 📅 FILTRO
   dataInicial: Date | null = null;
   dataFinal: Date | null = null;
 
   chartOptions = {
+    cutout: '68%',
     plugins: {
       legend: {
         display: false,
@@ -48,6 +53,10 @@ export class ReportsComponent implements OnInit {
   };
 
   loading = false;
+
+  get maiorCategoria(): string {
+    return this.resumoCategorias[0]?.nome ?? '-';
+  }
 
   async ngOnInit() {
     this.setMesAtual();
@@ -108,48 +117,72 @@ export class ReportsComponent implements OnInit {
 
   // 📊 GRÁFICO + RESUMO
   private montarGrafico(transacoes: Transacao[]) {
-    const mapa: Record<string, number> = {};
-    let total = 0;
+    const mapa = new Map<
+      string,
+      { nome: string; tipo: 'RECEITA' | 'DESPESA'; valor: number }
+    >();
 
     transacoes.forEach((t) => {
-      if (t.tipo === 'DESPESA') {
-        mapa[t.categoriaNome] = (mapa[t.categoriaNome] || 0) + Number(t.valor);
-
-        total += Number(t.valor);
-      }
-    });
-
-    const cores = [
-      '#22c55e',
-      '#ef4444',
-      '#3b82f6',
-      '#f59e0b',
-      '#8b5cf6',
-      '#06b6d4',
-    ];
-
-    const categorias = Object.keys(mapa);
-
-    this.resumoCategorias = categorias.map((nome, i) => {
-      const valor = mapa[nome];
-
-      return {
-        nome,
-        valor,
-        percentual: total > 0 ? ((valor / total) * 100).toFixed(0) : '0',
-        cor: cores[i % cores.length],
+      const chave = `${t.tipo}-${t.categoriaNome}`;
+      const atual = mapa.get(chave) ?? {
+        nome: t.categoriaNome,
+        tipo: t.tipo,
+        valor: 0,
       };
+
+      atual.valor += Number(t.valor);
+      mapa.set(chave, atual);
     });
+
+    this.totalReceitas = transacoes
+      .filter((t) => t.tipo === 'RECEITA')
+      .reduce((acc, t) => acc + Number(t.valor), 0);
+
+    this.totalDespesas = transacoes
+      .filter((t) => t.tipo === 'DESPESA')
+      .reduce((acc, t) => acc + Number(t.valor), 0);
+
+    this.saldoPeriodo = this.totalReceitas - this.totalDespesas;
+    this.totalMovimentado = this.totalReceitas + this.totalDespesas;
+
+    const coresReceita = ['#16a34a', '#22c55e', '#059669', '#14b8a6'];
+    const coresDespesa = ['#dc2626', '#f97316', '#f59e0b', '#8b5cf6'];
+    let receitaIndex = 0;
+    let despesaIndex = 0;
+
+    this.resumoCategorias = Array.from(mapa.values())
+      .map((categoria) => {
+        const cores =
+          categoria.tipo === 'RECEITA' ? coresReceita : coresDespesa;
+        const indice =
+          categoria.tipo === 'RECEITA' ? receitaIndex++ : despesaIndex++;
+
+        return {
+          ...categoria,
+          percentual:
+            this.totalMovimentado > 0
+              ? ((categoria.valor / this.totalMovimentado) * 100).toFixed(0)
+              : '0',
+          cor: cores[indice % cores.length],
+        };
+      })
+      .sort((a, b) => b.valor - a.valor);
 
     this.graficoCategorias = {
-      labels: categorias,
+      labels: this.resumoCategorias.map(
+        (categoria) => `${categoria.nome} (${this.tipoLabel(categoria.tipo)})`,
+      ),
       datasets: [
         {
-          data: Object.values(mapa),
+          data: this.resumoCategorias.map((categoria) => categoria.valor),
           backgroundColor: this.resumoCategorias.map((c) => c.cor),
           borderWidth: 0,
         },
       ],
     };
+  }
+
+  tipoLabel(tipo: 'RECEITA' | 'DESPESA'): string {
+    return tipo === 'RECEITA' ? 'Receita' : 'Despesa';
   }
 }

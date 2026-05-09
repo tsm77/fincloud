@@ -2,211 +2,265 @@
 <!-- eslint-disable @angular-eslint/template/elements-content -->
 <p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>
-<div class="page">
-  <!-- HEADER -->
-  <div class="flex justify-content-between align-items-center mb-4">
-    <div>
-      <h2 class="m-0">Transações</h2>
-      <small class="text-500">Controle financeiro por categoria</small>
+
+<section class="transactions-page">
+  <header class="page-header">
+    <div class="title-block">
+      <span class="eyebrow">Movimentacoes</span>
+      <h2>Transacoes</h2>
+      <p>Controle seus lancamentos por categoria e periodo.</p>
     </div>
 
     <button
       pButton
+      type="button"
       icon="pi pi-plus"
-      label="Nova Transação"
+      label="Nova transacao"
+      class="new-transaction-btn"
       (click)="abrirNova()"
     ></button>
-  </div>
+  </header>
 
-  <!-- =========================
-       FILTRO POR MÊS (🔥 NOVO)
-  ========================= -->
-  <div class="flex justify-content-center align-items-center gap-4 mb-4">
+  <div class="month-bar">
     <button
       pButton
+      type="button"
       icon="pi pi-chevron-left"
-      class="p-button-text"
+      class="p-button-text month-btn"
+      aria-label="Mes anterior"
       (click)="mesAnterior()"
     ></button>
 
-    <div class="text-xl font-semibold">{{ mesNomeAtual }} {{ anoAtual }}</div>
+    <div class="month-label">
+      <span>Periodo</span>
+      <strong>{{ mesNomeAtual }} {{ anoAtual }}</strong>
+    </div>
 
     <button
       pButton
+      type="button"
       icon="pi pi-chevron-right"
-      class="p-button-text"
+      class="p-button-text month-btn"
+      aria-label="Proximo mes"
       (click)="proximoMes()"
     ></button>
   </div>
 
-  <!-- =========================
-       TABELA AGRUPADA
-  ========================= -->
-  <div class="table-wrapper">
-    <p-table [value]="transacoesAgrupadas" dataKey="categoria">
-      <!-- HEADER -->
-      <ng-template pTemplate="header">
-        <tr>
-          <th style="width: 40px"></th>
-          <th>Categoria</th>
-          <th>Total</th>
-          <th></th>
-        </tr>
-      </ng-template>
+  <div class="summary-row">
+    <div class="summary-card">
+      <span>Total do mes</span>
+      <strong>{{ totalMes | currency: "BRL" }}</strong>
+    </div>
+    <div class="summary-card">
+      <span>Pago</span>
+      <strong class="positive">{{ totalPago | currency: "BRL" }}</strong>
+    </div>
+    <div class="summary-card">
+      <span>Pendente</span>
+      <strong class="negative">{{ totalPendente | currency: "BRL" }}</strong>
+    </div>
+  </div>
 
-      <!-- BODY -->
-      <ng-template pTemplate="body" let-grupo>
-        <!-- LINHA CATEGORIA -->
-        <tr>
-          <td>
-            <button
-              pButton
-              type="button"
-              (click)="toggleCategoria(grupo.categoria)"
-              [icon]="
-                expandedCategorias[grupo.categoria]
-                  ? 'pi pi-chevron-down'
-                  : 'pi pi-chevron-right'
-              "
-              class="p-button-text"
-            ></button>
-          </td>
+  @if (loading()) {
+    <div class="loading-panel">
+      <p-progressSpinner ariaLabel="Carregando transacoes"></p-progressSpinner>
+    </div>
+  } @else if (transacoesAgrupadas.length) {
+    <div class="category-list">
+      @for (grupo of transacoesAgrupadas; track grupo.categoria) {
+        <article class="category-card">
+          <button
+            type="button"
+            class="category-header"
+            (click)="toggleCategoria(grupo.categoria)"
+          >
+            <span class="category-left">
+              <span class="category-dot" [style.background]="grupo.cor"></span>
+              <span>
+                <strong>{{ grupo.categoria }}</strong>
+                <small>{{ grupo.itens.length }} lancamento(s)</small>
+              </span>
+            </span>
 
-          <td>
-            <div class="flex align-items-center gap-2">
-              <span
-                class="border-circle"
-                style="width: 10px; height: 10px"
-                [style.background]="grupo.cor"
-              ></span>
+            <span class="category-right">
+              <strong>{{ grupo.total | currency: "BRL" }}</strong>
+              <i
+                [class]="
+                  expandedCategorias[grupo.categoria]
+                    ? 'pi pi-chevron-up'
+                    : 'pi pi-chevron-down'
+                "
+              ></i>
+            </span>
+          </button>
 
-              <b>{{ grupo.categoria }}</b>
-            </div>
-          </td>
+          @if (expandedCategorias[grupo.categoria]) {
+            <div class="transaction-list">
+              @for (item of grupo.itens; track item.id) {
+                <div class="transaction-item">
+                  <div class="transaction-main">
+                    <span
+                      class="status-dot"
+                      [class.paid]="item.pago"
+                      [class.income]="isReceita(item)"
+                    ></span>
+                    <div>
+                      <strong>{{ item.descricao }}</strong>
+                      <small>
+                        {{ item.data | date: "dd/MM/yyyy" }} ·
+                        {{ item.contaNome }}
+                      </small>
+                    </div>
+                  </div>
 
-          <td>
-            <b>{{ grupo.total | currency: "BRL" }}</b>
-          </td>
-
-          <td></td>
-        </tr>
-
-        <!-- EXPANSÃO -->
-        <tr *ngIf="expandedCategorias[grupo.categoria]">
-          <td colspan="6">
-            <table class="w-full sub-table">
-              <thead>
-                <tr>
-                  <th style="width: 120px">Data</th>
-                  <th>Descrição</th>
-                  <th>Conta</th>
-                  <th style="width: 120px; text-align: right">Valor</th>
-                  <th style="width: 80px; text-align: center">Pago</th>
-                  <th style="width: 100px"></th>
-                </tr>
-              </thead>
-
-              <tbody>
-                @for (item of grupo.itens; track item) {
-                  <tr>
-                    <td style="width: 120px">
-                      {{ item.data | date: "dd/MM/yyyy" }}
-                    </td>
-
-                    <td>{{ item.descricao }}</td>
-
-                    <td>{{ item.contaNome }}</td>
-
-                    <td
-                      style="width: 120px; text-align: right"
-                      [ngClass]="{
-                        'text-green-500': item.pago,
-                        'text-red-500': !item.pago,
-                      }"
+                  <div class="transaction-side">
+                    <strong
+                      class="transaction-value"
+                      [class.paid]="item.pago"
+                      [class.income]="isReceita(item)"
                     >
                       {{ item.valor | currency: "BRL" }}
-                    </td>
+                    </strong>
 
-                    <td style="width: 80px; text-align: center">
+                    @if (isDespesa(item)) {
                       <p-checkbox
                         [binary]="true"
                         [ngModel]="item.pago"
                         (onChange)="confirmarPagamento($event, item)"
                       ></p-checkbox>
-                    </td>
+                    } @else {
+                      <span class="income-badge">Receita</span>
+                    }
 
-                    <td style="width: 100px">
+                    <div class="row-actions">
                       <button
                         pButton
+                        type="button"
                         icon="pi pi-pencil"
-                        class="p-button-text btn-edit"
+                        class="p-button-text action-btn btn-edit"
+                        aria-label="Editar transacao"
                         (click)="editar(item)"
                       ></button>
                       <button
                         pButton
+                        type="button"
                         icon="pi pi-trash"
-                        class="p-button-text btn-delete"
+                        class="p-button-text action-btn btn-delete"
+                        aria-label="Excluir transacao"
                         (click)="remover(item)"
                       ></button>
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </article>
+      }
+    </div>
+  } @else {
+    <div class="empty-state">
+      <div class="empty-content">
+        <span class="empty-icon">
+          <i class="pi pi-sort-alt"></i>
+        </span>
+        <h3>Nenhuma transacao no periodo</h3>
+        <p>Crie um lancamento para acompanhar suas movimentacoes neste mes.</p>
+        <button
+          pButton
+          type="button"
+          icon="pi pi-plus"
+          label="Nova transacao"
+          (click)="abrirNova()"
+        ></button>
+      </div>
+    </div>
+  }
 
-  <!-- =========================
-     DIALOG
-========================= -->
   <p-dialog
-    header="Nova Transação"
+    [header]="editandoId ? 'Editar transacao' : 'Nova transacao'"
     [visible]="dialogAberto()"
     (visibleChange)="dialogAberto.set($event)"
     [modal]="true"
-    [style]="{ width: '600px' }"
+    [style]="{ width: '720px', maxWidth: '95vw' }"
     [contentStyle]="{ overflow: 'visible' }"
     [baseZIndex]="10000"
+    [draggable]="false"
+    [resizable]="false"
   >
-    <form [formGroup]="form" class="flex flex-column gap-3">
-      <p-dropdown
-        [options]="contas()"
-        optionLabel="nome"
-        optionValue="id"
-        formControlName="contaId"
-        placeholder="Conta"
-      ></p-dropdown>
+    <form [formGroup]="form" class="transaction-form">
+      <div class="dialog-intro">
+        <span class="dialog-icon">
+          <i class="pi pi-receipt"></i>
+        </span>
+        <div>
+          <strong>{{ editandoId ? "Atualizar lancamento" : "Cadastrar lancamento" }}</strong>
+          <p>Selecione conta, categoria, data e os itens da transacao.</p>
+        </div>
+      </div>
 
-      <p-dropdown
-        [options]="categorias()"
-        optionLabel="nome"
-        optionValue="id"
-        formControlName="categoriaId"
-        placeholder="Categoria"
-      ></p-dropdown>
+      <div class="form-grid">
+        <div class="field">
+          <label for="conta">Conta</label>
+          <p-dropdown
+            inputId="conta"
+            [options]="contas()"
+            optionLabel="nome"
+            optionValue="id"
+            formControlName="contaId"
+            placeholder="Selecione"
+            appendTo="body"
+          ></p-dropdown>
+        </div>
 
-      <p-datepicker
-        formControlName="data"
-        dateFormat="dd/mm/yy"
-        [showIcon]="true"
-        appendTo="body"
-        inputStyleClass="w-full"
-      ></p-datepicker>
+        <div class="field">
+          <label for="categoria">Categoria</label>
+          <p-dropdown
+            inputId="categoria"
+            [options]="categorias()"
+            optionLabel="nome"
+            optionValue="id"
+            formControlName="categoriaId"
+            placeholder="Selecione"
+            appendTo="body"
+          ></p-dropdown>
+        </div>
 
-      <div formArrayName="items">
+        <div class="field">
+          <label for="data">Data</label>
+          <p-datepicker
+            inputId="data"
+            formControlName="data"
+            dateFormat="dd/mm/yy"
+            [showIcon]="true"
+            appendTo="body"
+          ></p-datepicker>
+        </div>
+      </div>
+
+      <div class="items-head">
+        <strong>Itens</strong>
+        <button
+          pButton
+          type="button"
+          icon="pi pi-plus"
+          label="Adicionar item"
+          class="p-button-outlined add-item-btn"
+          (click)="adicionarItem()"
+        ></button>
+      </div>
+
+      <div formArrayName="items" class="items-list">
         <div
           *ngFor="let item of items.controls; let i = index"
           [formGroupName]="i"
-          class="item-row flex gap-2 align-items-center"
+          class="item-row"
         >
           <input
             pInputText
             formControlName="descricao"
-            placeholder="Descrição"
-            class="flex-1"
+            placeholder="Descricao"
+            class="description-input"
           />
 
           <p-inputNumber
@@ -219,56 +273,58 @@
             [minFractionDigits]="2"
             [maxFractionDigits]="2"
             [useGrouping]="true"
-            inputStyleClass="w-full"
-            [style]="{ width: '140px' }"
           ></p-inputNumber>
-
-          <div class="parcelamento">
-            <button
-              pButton
-              type="button"
-              class="p-button-outlined p-button-sm"
-              (click)="toggleParcelado(i)"
-              [label]="item.get('parcelado')?.value ? 'Parcelado' : 'À vista'"
-            ></button>
-
-            @if (item.get("parcelado")?.value) {
-              <input
-                type="number"
-                pInputText
-                formControlName="numeroParcelas"
-                placeholder="Parcelas"
-                style="width: 80px"
-                min="1"
-              />
-            }
-          </div>
 
           <button
             pButton
-            icon="pi pi-trash"
-            (click)="removerItem(i)"
             type="button"
+            class="p-button-outlined installment-btn"
+            (click)="toggleParcelado(i)"
+            [label]="item.get('parcelado')?.value ? 'Parcelado' : 'A vista'"
+          ></button>
+
+          @if (item.get("parcelado")?.value) {
+            <input
+              type="number"
+              pInputText
+              formControlName="numeroParcelas"
+              placeholder="Parcelas"
+              class="installment-input"
+              min="1"
+            />
+          }
+
+          <button
+            pButton
+            type="button"
+            icon="pi pi-trash"
+            class="p-button-text action-btn btn-delete"
+            aria-label="Remover item"
+            (click)="removerItem(i)"
           ></button>
         </div>
       </div>
-
-      <button
-        pButton
-        label="Adicionar item"
-        (click)="adicionarItem()"
-        type="button"
-      ></button>
     </form>
 
     <ng-template pTemplate="footer">
-      <button pButton label="Cancelar" (click)="fecharDialog()"></button>
-      <button
-        pButton
-        label="Salvar"
-        (click)="salvar()"
-        [disabled]="form.invalid"
-      ></button>
+      <div class="dialog-actions">
+        <button
+          pButton
+          type="button"
+          label="Cancelar"
+          class="p-button-outlined"
+          (click)="fecharDialog()"
+        ></button>
+        <button
+          pButton
+          type="button"
+          label="Salvar"
+          icon="pi pi-check"
+          [loading]="loading()"
+          [disabled]="form.invalid || loading()"
+          (click)="salvar()"
+        ></button>
+      </div>
     </ng-template>
   </p-dialog>
-</div>
+</section>

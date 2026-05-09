@@ -1,245 +1,323 @@
-.dashboard-container {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-/* Header */
-.dashboard-header {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  
-  @media (min-width: 768px) {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-end;
-  }
-}
-
-.header-content {
-  flex: 1;
-  
-  .page-title {
-    font-size: 1.875rem;
-    font-weight: 700;
-    color: #0f172a;
-    margin: 0;
-    letter-spacing: -0.02em;
-  }
-  
-  .page-subtitle {
-    font-size: 0.95rem;
-    color: #64748b;
-    margin: 0.5rem 0 0 0;
-    font-weight: 500;
-  }
-}
-
-/* Filtros */
-.filters-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.dashboard-page {
   width: 100%;
-  
-  @media (min-width: 768px) {
-    flex-direction: row;
-    gap: 1.5rem;
-    width: auto;
-    align-items: flex-end;
-  }
 }
 
-.filter-group {
+.page-header,
+.filter-panel,
+.metrics-grid,
+.status-grid,
+.card-header,
+.transaction-item,
+.transaction-info {
+  display: flex;
+  align-items: center;
+}
+
+.page-header {
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.title-block h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 26px;
+}
+
+.title-block p,
+.card-header p,
+.transaction-info small {
+  margin: 4px 0 0;
+  color: #64748b;
+}
+
+.eyebrow {
+  color: #1e3a8a;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.filter-panel {
+  display: grid;
+  grid-template-columns: auto 170px 170px 94px;
+  gap: 14px;
+  align-items: end;
+  padding: 12px 12px 11px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.filter-title {
+  align-self: center;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #1e3a8a;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.filter-title i,
+.metric-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.filter-title i {
+  width: 34px;
+  height: 34px;
+  background: #eff6ff;
+}
+
+.field {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  width: 100%;
-  
-  @media (min-width: 768px) {
-    width: auto;
-    min-width: 150px;
-  }
-  
-  label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #475569;
-  }
-  
-  ::ng-deep p-datepicker {
+  gap: 6px;
+}
+
+.field label,
+.metric-label,
+.status-card span {
+  color: #64748b;
+  font-size: 12px;
+}
+
+:host ::ng-deep .filter-panel {
+  .p-datepicker,
+  .p-inputtext {
     width: 100%;
-    
-    .p-datepicker-calendar {
-      width: 100%;
-    }
+  }
+
+  .p-datepicker input {
+    min-height: 38px;
   }
 }
 
 .filter-btn {
-  width: 100%;
-  
-  @media (min-width: 768px) {
-    width: auto;
-  }
+  width: 94px;
+  min-height: 38px;
+  justify-content: center;
+  transform: translateY(-17px);
 }
 
-/* Cards Grid */
-.cards-grid {
+.metrics-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
-  
-  @media (min-width: 768px) {
-    grid-template-columns: repeat(3, 1fr);
-  }
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 14px;
 }
 
-/* Metric Card */
+.metric-card,
+.status-card,
+.detail-card,
+.loading-panel {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
 .metric-card {
-  transition: all 0.3s ease;
-  
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12) !important;
-  }
-  
-  .card-header {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 1rem;
-    border-bottom: 1px solid #e5e7eb;
-    background: #f9fafb;
-    
-    .card-title {
-      font-weight: 600;
-      font-size: 0.95rem;
-      color: #0f172a;
-      margin: 0;
-    }
-  }
-  
-  .p-card-body {
-    padding: 1.5rem;
-  }
-  
-  .metric-value {
-    text-align: center;
-    
-    h3 {
-      font-size: 1.875rem;
-      font-weight: 700;
-      margin: 0;
-      color: #1e3a8a;
-      
-      &.text-danger {
-        color: #ef4444;
-      }
-      
-      &.text-success {
-        color: #10b981;
-      }
-    }
-    
-    p {
-      font-size: 0.875rem;
-      color: #64748b;
-      margin: 0.5rem 0 0 0;
-      font-weight: 500;
-    }
-  }
+  gap: 12px;
+  padding: 16px;
 }
 
-/* Detail Card */
+.metric-icon {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  background: #eff6ff;
+  color: #1e3a8a;
+}
+
+.metric-icon.income {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.metric-icon.expense {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.metric-icon.investment {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.metric-card strong {
+  display: block;
+  margin-top: 5px;
+  color: #0f172a;
+  font-size: 21px;
+}
+
+.positive {
+  color: #16a34a !important;
+}
+
+.negative {
+  color: #dc2626 !important;
+}
+
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.status-card {
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  border-left: 4px solid #dc2626;
+}
+
+.status-card.paid {
+  border-left-color: #16a34a;
+}
+
+.status-card strong {
+  display: block;
+  color: #0f172a;
+  font-size: 24px;
+}
+
+.status-value {
+  text-align: right;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
 .detail-card {
-  .card-header {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 1rem;
-    border-bottom: 1px solid #e5e7eb;
-    background: #f9fafb;
-    
-    .card-title {
-      font-weight: 600;
-      font-size: 0.95rem;
-      color: #0f172a;
-      margin: 0;
-    }
-  }
-  
-  .p-card-body {
-    padding: 1.5rem;
-  }
+  overflow: hidden;
 }
 
-/* Transactions List */
+.card-header {
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.card-header h3 {
+  margin: 0;
+  color: #0f172a;
+}
+
+.count-pill {
+  min-width: 34px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #fee2e2;
+  color: #dc2626;
+  font-weight: 800;
+  text-align: center;
+}
+
+.count-pill.success {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
 .transactions-list {
   display: flex;
   flex-direction: column;
-  gap: 0;
 }
 
 .transaction-item {
-  display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  border-bottom: 1px solid #e5e7eb;
-  transition: all 0.3s ease;
-  
-  &:last-child {
-    border-bottom: none;
-  }
-  
-  &:hover {
-    background: #f9fafb;
-  }
-  
-  .transaction-info {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    flex: 1;
-  }
-  
-  .transaction-desc {
-    font-weight: 600;
-    color: #0f172a;
-    font-size: 0.95rem;
-  }
-  
-  .transaction-meta {
-    font-size: 0.85rem;
-    color: #64748b;
-  }
-  
-  .transaction-value {
-    font-weight: 700;
-    font-size: 1rem;
-    white-space: nowrap;
-    margin-left: 1rem;
-    
-    &.text-danger {
-      color: #ef4444;
-    }
-    
-    &.text-success {
-      color: #10b981;
-    }
-  }
+  gap: 14px;
+  padding: 14px 16px;
 }
 
-.empty-state {
-  text-align: center;
-  padding: 2rem 1rem;
+.transaction-item + .transaction-item {
+  border-top: 1px solid #f1f5f9;
+}
+
+.transaction-info {
+  min-width: 0;
+  gap: 10px;
+}
+
+.transaction-info strong {
+  display: block;
+  overflow: hidden;
+  color: #0f172a;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+}
+
+.status-dot.danger {
+  background: #ef4444;
+}
+
+.status-dot.success {
+  background: #22c55e;
+}
+
+.transaction-value {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.empty-state,
+.loading-panel {
+  padding: 28px 16px;
   color: #64748b;
-  font-size: 0.95rem;
-  margin: 0;
+  text-align: center;
 }
 
-.mt-4 {
-  margin-top: 1.5rem;
+.loading-panel {
+  min-height: 320px;
+  justify-content: center;
+}
+
+@media (max-width: 1100px) {
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .page-header,
+  .filter-panel {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .filter-panel {
+    display: flex;
+  }
+
+  .filter-btn {
+    width: 100%;
+    transform: none;
+  }
+
+  .metrics-grid,
+  .status-grid {
+    grid-template-columns: 1fr;
+  }
 }

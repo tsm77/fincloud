@@ -24,7 +24,6 @@ export const routes: Routes = [
       { path: 'categorias', component: CategoriasComponent },
       { path: 'relatorios', component: ReportsComponent },
       { path: 'usuarios', component: UsuariosComponent },
-      // { path: 'configuracoes', component: ConfiguracoesComponent },
     ],
   },
 

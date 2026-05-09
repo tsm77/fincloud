@@ -1,129 +1,132 @@
 <p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>
 
-<div class="page">
-  <!-- HEADER -->
-  <div class="page-header">
-    <div class="header-left">
-      <h2 class="title">Categorias</h2>
-      <p class="subtitle">Crie e gerencie as categorias de entrada e saída.</p>
+<section class="categories-page">
+  <header class="page-header">
+    <div class="title-block">
+      <span class="eyebrow">Organizacao</span>
+      <h2>Categorias</h2>
+      <p>Crie grupos para classificar entradas e saidas.</p>
     </div>
 
-    <div class="header-right">
-      <!-- BUSCA -->
-      <span class="p-input-icon-left search">
+    <button
+      pButton
+      type="button"
+      icon="pi pi-plus"
+      class="new-category-btn"
+      (click)="abrirNova()"
+      aria-label="Nova categoria"
+    >
+      <span>Nova categoria</span>
+    </button>
+  </header>
+
+  <div class="summary-row">
+    <div class="summary-card">
+      <span>Total</span>
+      <strong>{{ totalCategorias() }}</strong>
+    </div>
+
+    <div class="summary-card">
+      <span>Receitas</span>
+      <strong class="positive">{{ totalReceitas() }}</strong>
+    </div>
+
+    <div class="summary-card">
+      <span>Despesas</span>
+      <strong class="negative">{{ totalDespesas() }}</strong>
+    </div>
+
+    <div class="search-card">
+      <span class="p-input-icon-left">
         <i class="pi pi-search"></i>
         <input
           pInputText
           type="text"
-          placeholder="Buscar..."
+          placeholder="Buscar categoria"
           [value]="filtro()"
           (input)="filtro.set(($any($event.target).value ?? '').toString())"
         />
       </span>
-
-      <!-- BOTÃO NOVA -->
-      <button
-        pButton
-        icon="pi pi-plus"
-        label="Nova Categoria"
-        (click)="abrirNova()"
-        aria-label="Nova categoria"
-      ></button>
     </div>
   </div>
 
-  <!-- TABELA -->
-  <div class="table-wrapper">
-    <p-table
-      [value]="categoriasFiltradas()"
-      [loading]="loading()"
-      [paginator]="true"
-      [rows]="10"
-      [rowsPerPageOptions]="[10, 20, 50]"
-      responsiveLayout="scroll"
-    >
-      <!-- HEADER -->
-      <ng-template pTemplate="header">
-        <tr>
-          <th>Nome</th>
-          <th>Tipo</th>
-          <th>Cor</th>
-          <th>Ações</th>
-        </tr>
-      </ng-template>
-
-      <!-- BODY -->
-      <ng-template pTemplate="body" let-cat>
-        <tr>
-          <td>
-            <span class="nome-pill" [style.background]="cat.cor">
-              {{ cat.nome }}
+  @if (loading()) {
+    <div class="loading-panel">
+      <p-progressSpinner ariaLabel="Carregando categorias"></p-progressSpinner>
+    </div>
+  } @else if (categoriasFiltradas().length) {
+    <div class="categories-grid">
+      @for (cat of categoriasFiltradas(); track cat.id) {
+        <article class="category-card">
+          <div class="card-top">
+            <span class="category-icon" [style.background]="cat.cor">
+              <i class="pi pi-tag"></i>
             </span>
-          </td>
 
-          <td>
-            <p-tag
-              [value]="tipoLabel(cat.tipo)"
-              [severity]="tipoSeverity(cat.tipo)"
-            ></p-tag>
-          </td>
+            <div class="category-title">
+              <strong>{{ cat.nome }}</strong>
+              <p-tag
+                [value]="tipoLabel(cat.tipo)"
+                [severity]="tipoSeverity(cat.tipo)"
+              ></p-tag>
+            </div>
+          </div>
 
-          <td>
-            <span class="cor-dot" [style.background]="cat.cor"></span>
-            <span class="cor-text">{{ cat.cor }}</span>
-          </td>
+          <div class="card-bottom">
+            <div class="color-meta">
+              <span class="color-dot" [style.background]="cat.cor"></span>
+              <span>{{ cat.cor }}</span>
+            </div>
 
-          <td class="acoes">
-            <button
-              pButton
-              icon="pi pi-pencil"
-              class="p-button-text btn-edit"
-              (click)="abrirEdicao(cat)"
-              aria-label="Editar categoria"
-            ></button>
-
-            <button
-              pButton
-              icon="pi pi-trash"
-              class="p-button-text btn-delete"
-              (click)="confirmarRemocao(cat)"
-              aria-label="Excluir categoria"
-            ></button>
-          </td>
-        </tr>
-      </ng-template>
-
-      <!-- EMPTY -->
-      <ng-template pTemplate="emptymessage">
-        <tr>
-          <td colspan="4">
-            <div class="empty">
-              <i class="pi pi-inbox empty-icon"></i>
-
-              <div class="empty-title">Nenhuma categoria ainda</div>
-
-              <div class="empty-subtitle">
-                Comece criando uma nova categoria.
-              </div>
+            <div class="actions">
+              <button
+                pButton
+                type="button"
+                icon="pi pi-pencil"
+                class="p-button-text action-btn btn-edit"
+                (click)="abrirEdicao(cat)"
+                aria-label="Editar categoria"
+              >
+                <span class="sr-only">Editar categoria</span>
+              </button>
 
               <button
                 pButton
-                icon="pi pi-plus"
-                label="Nova Categoria"
-                (click)="abrirNova()"
-              ></button>
+                type="button"
+                icon="pi pi-trash"
+                class="p-button-text action-btn btn-delete"
+                (click)="confirmarRemocao(cat)"
+                aria-label="Excluir categoria"
+              >
+                <span class="sr-only">Excluir categoria</span>
+              </button>
             </div>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </div>
-</div>
+          </div>
+        </article>
+      }
+    </div>
+  } @else {
+    <div class="empty-state">
+      <span class="empty-icon">
+        <i class="pi pi-tags"></i>
+      </span>
+      <h3>Nenhuma categoria encontrada</h3>
+      <p>Crie uma nova categoria ou ajuste sua busca.</p>
+      <button
+        pButton
+        type="button"
+        icon="pi pi-plus"
+        (click)="abrirNova()"
+      >
+        <span>Nova categoria</span>
+      </button>
+    </div>
+  }
+</section>
 
-<!-- 🔥 DIALOG CORRIGIDO -->
 <p-dialog
-  [header]="modoEdicao() ? 'Editar Categoria' : 'Nova Categoria'"
+  [header]="modoEdicao() ? 'Editar categoria' : 'Nova categoria'"
   [visible]="dialogAberto()"
   (visibleChange)="dialogAberto.set($event)"
   [modal]="true"
@@ -132,8 +135,17 @@
   [style]="{ width: '520px', maxWidth: '95vw' }"
   (onHide)="fecharDialog()"
 >
-  <form class="dialog-form" [formGroup]="form">
-    <!-- NOME -->
+  <form class="category-form" [formGroup]="form">
+    <div class="dialog-intro">
+      <span class="dialog-icon">
+        <i class="pi pi-tag"></i>
+      </span>
+      <div>
+        <strong>{{ modoEdicao() ? "Atualizar categoria" : "Cadastrar categoria" }}</strong>
+        <p>Defina nome, tipo e cor para identificar seus lancamentos.</p>
+      </div>
+    </div>
+
     <div class="field">
       <label for="nome">Nome</label>
       <input
@@ -143,44 +155,48 @@
         placeholder="Nome da categoria"
       />
       @if (form.controls.nome.touched && form.controls.nome.invalid) {
-        <small class="error"> Informe um nome (2–40 caracteres). </small>
+        <small class="error">Informe um nome com 2 a 40 caracteres.</small>
       }
     </div>
 
-    <!-- TIPO -->
     <div class="field">
-      <label for="tipo">Tipo</label>
-      <div class="tipo-row">
-        <p-radioButton
-          inputId="receita"
-          name="tipo"
-          id="tipo"
-          value="RECEITA"
-          formControlName="tipo"
-        >
-        </p-radioButton>
-        <label for="receita" class="tipo-label">Receita</label>
+      <div class="field-label">Tipo</div>
+      <div class="type-options">
+        <div class="type-option" [class.selected]="form.controls.tipo.value === 'RECEITA'">
+          <p-radioButton
+            inputId="receita"
+            name="tipo"
+            value="RECEITA"
+            formControlName="tipo"
+          ></p-radioButton>
+          <label for="receita">
+            <i class="pi pi-arrow-up-right"></i>
+            Receita
+          </label>
+        </div>
 
-        <p-radioButton
-          inputId="despesa"
-          name="tipo"
-          value="DESPESA"
-          formControlName="tipo"
-        >
-        </p-radioButton>
-        <label for="despesa" class="tipo-label">Despesa</label>
+        <div class="type-option" [class.selected]="form.controls.tipo.value === 'DESPESA'">
+          <p-radioButton
+            inputId="despesa"
+            name="tipo"
+            value="DESPESA"
+            formControlName="tipo"
+          ></p-radioButton>
+          <label for="despesa">
+            <i class="pi pi-arrow-down-left"></i>
+            Despesa
+          </label>
+        </div>
       </div>
     </div>
 
-    <!-- CORES -->
     <div class="field">
-      <label for="cor">Cor</label>
-      <div class="cores">
+      <div class="field-label">Cor</div>
+      <div class="colors">
         @for (c of cores; track c) {
           <button
             type="button"
-            id="cor"
-            class="cor-btn"
+            class="color-btn"
             [class.selected]="form.controls.cor.value === c"
             [style.background]="c"
             (click)="selecionarCor(c)"
@@ -195,20 +211,27 @@
     </div>
   </form>
 
-  <!-- FOOTER -->
   <ng-template pTemplate="footer">
-    <button
-      pButton
-      class="p-button-text"
-      label="Cancelar"
-      (click)="fecharDialog()"
-    ></button>
+    <div class="dialog-actions">
+      <button
+        pButton
+        type="button"
+        class="p-button-outlined"
+        (click)="fecharDialog()"
+      >
+        <span>Cancelar</span>
+      </button>
 
-    <button
-      pButton
-      label="Salvar"
-      [disabled]="loading()"
-      (click)="salvar()"
-    ></button>
+      <button
+        pButton
+        type="button"
+        icon="pi pi-check"
+        [loading]="loading()"
+        [disabled]="loading() || form.invalid"
+        (click)="salvar()"
+      >
+        <span>Salvar</span>
+      </button>
+    </div>
   </ng-template>
 </p-dialog>

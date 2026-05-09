@@ -1,140 +1,186 @@
-<!-- eslint-disable @angular-eslint/template/elements-content -->
-<div class="dashboard-container">
-  <!-- HEADER -->
-  <div class="dashboard-header">
-    <div class="header-content">
-      <h2 class="page-title">Dashboard</h2>
-      <p class="page-subtitle">Resumo financeiro por mês</p>
+<section class="dashboard-page">
+  <header class="page-header">
+    <div class="title-block">
+      <span class="eyebrow">Visao geral</span>
+      <h2>Dashboard</h2>
+      <p>Resumo financeiro do periodo selecionado.</p>
     </div>
 
-    <div class="filters-container">
-      <div class="filter-group">
+    <div class="filter-panel" aria-label="Filtros do dashboard">
+      <div class="filter-title">
+        <i class="pi pi-calendar"></i>
+        <span>Periodo</span>
+      </div>
+
+      <div class="field">
         <label for="data-inicial">Data inicial</label>
         <p-datepicker
           [(ngModel)]="dataInicial"
           dateFormat="dd/mm/yy"
           [showIcon]="true"
           inputId="data-inicial"
+          appendTo="body"
         ></p-datepicker>
       </div>
 
-      <div class="filter-group">
+      <div class="field">
         <label for="data-final">Data final</label>
         <p-datepicker
           [(ngModel)]="dataFinal"
           dateFormat="dd/mm/yy"
           [showIcon]="true"
           inputId="data-final"
+          appendTo="body"
         ></p-datepicker>
       </div>
 
       <button
         pButton
-        label="Filtrar"
+        type="button"
         icon="pi pi-filter"
-        (click)="aplicarFiltro()"
         class="filter-btn"
-      ></button>
+        (click)="aplicarFiltro()"
+      >
+        <span>Filtrar</span>
+      </button>
     </div>
-  </div>
+  </header>
 
-  <!-- CARDS PRINCIPAIS -->
-  <div class="cards-grid">
-    <!-- INVESTIMENTOS -->
-    <p-card class="metric-card">
-      <ng-template pTemplate="header">
-        <div class="card-header">
-          <span class="card-title">Investimentos</span>
+  @if (loading) {
+    <div class="loading-panel">
+      <p-progressSpinner ariaLabel="Carregando dashboard"></p-progressSpinner>
+    </div>
+  } @else {
+    <div class="metrics-grid">
+      <article class="metric-card balance-card">
+        <span class="metric-icon">
+          <i class="pi pi-wallet"></i>
+        </span>
+        <div>
+          <span class="metric-label">Saldo do periodo</span>
+          <strong [class.negative]="saldoTotal < 0">
+            {{ saldoTotal | currency: "BRL" }}
+          </strong>
         </div>
-      </ng-template>
-      <div class="metric-value">
-        <h3 class="text-success">{{ totalInvestido | currency: "BRL" }}</h3>
-        <p>Total investido</p>
-      </div>
-    </p-card>
+      </article>
 
-    <!-- CONTAS NÃO PAGAS -->
-    <p-card class="metric-card">
-      <ng-template pTemplate="header">
-        <div class="card-header">
-          <span class="card-title">Contas Não Pagas</span>
+      <article class="metric-card">
+        <span class="metric-icon income">
+          <i class="pi pi-arrow-up-right"></i>
+        </span>
+        <div>
+          <span class="metric-label">Receitas</span>
+          <strong class="positive">{{ totalReceitas | currency: "BRL" }}</strong>
         </div>
-      </ng-template>
-      <div class="metric-value">
-        <h3 class="text-danger">
+      </article>
+
+      <article class="metric-card">
+        <span class="metric-icon expense">
+          <i class="pi pi-arrow-down-left"></i>
+        </span>
+        <div>
+          <span class="metric-label">Despesas</span>
+          <strong class="negative">{{ totalDespesas | currency: "BRL" }}</strong>
+        </div>
+      </article>
+
+      <article class="metric-card">
+        <span class="metric-icon investment">
+          <i class="pi pi-chart-line"></i>
+        </span>
+        <div>
+          <span class="metric-label">Investimentos</span>
+          <strong>{{ totalInvestido | currency: "BRL" }}</strong>
+        </div>
+      </article>
+    </div>
+
+    <div class="status-grid">
+      <article class="status-card pending">
+        <div>
+          <span>Contas pendentes</span>
+          <strong>{{ contasNaoPagas.length }}</strong>
+        </div>
+        <strong class="status-value">
           {{ contasNaoPagesTotalValor | currency: "BRL" }}
-        </h3>
-        <p>{{ contasNaoPagas.length }} contas pendentes</p>
-      </div>
-    </p-card>
+        </strong>
+      </article>
 
-    <!-- CONTAS PAGAS -->
-    <p-card class="metric-card">
-      <ng-template pTemplate="header">
-        <div class="card-header">
-          <span class="card-title">Contas Pagas</span>
+      <article class="status-card paid">
+        <div>
+          <span>Contas pagas</span>
+          <strong>{{ contasPagas.length }}</strong>
         </div>
-      </ng-template>
-      <div class="metric-value">
-        <h3>
+        <strong class="status-value">
           {{ contasPagasTotalValor | currency: "BRL" }}
-        </h3>
-        <p>{{ contasPagas.length }} contas pagas</p>
-      </div>
-    </p-card>
-  </div>
-
-  <!-- CONTAS NÃO PAGAS DETALHES -->
-  <p-card class="detail-card mt-4">
-    <ng-template pTemplate="header">
-      <div class="card-header">
-        <span class="card-title">Contas Não Pagas - Detalhes</span>
-      </div>
-    </ng-template>
-    <div class="transactions-list">
-      @for (transacao of contasNaoPagas; track transacao.id) {
-        <div class="transaction-item">
-          <div class="transaction-info">
-            <span class="transaction-desc">{{ transacao.descricao }}</span>
-            <small class="transaction-meta">
-              {{ transacao.categoriaNome }} -
-              {{ transacao.data | date: "dd/MM/yyyy" }}
-            </small>
-          </div>
-          <span class="transaction-value text-danger">{{
-            transacao.valor | currency: "BRL"
-          }}</span>
-        </div>
-      } @empty {
-        <p class="empty-state">Nenhuma conta não paga no período.</p>
-      }
+        </strong>
+      </article>
     </div>
-  </p-card>
 
-  <!-- CONTAS PAGAS DETALHES -->
-  <p-card class="detail-card mt-4">
-    <ng-template pTemplate="header">
-      <div class="card-header">
-        <span class="card-title">Contas Pagas - Detalhes</span>
-      </div>
-    </ng-template>
-    <div class="transactions-list">
-      @for (transacao of contasPagas; track transacao.id) {
-        <div class="transaction-item">
-          <div class="transaction-info">
-            <span class="transaction-desc">{{ transacao.descricao }}</span>
-            <small class="transaction-meta">
-              {{ transacao.categoriaNome }} -
-              {{ transacao.data | date: "dd/MM/yyyy" }}
-            </small>
+    <div class="details-grid">
+      <article class="detail-card">
+        <div class="card-header">
+          <div>
+            <h3>Contas pendentes</h3>
+            <p>Proximos compromissos do periodo.</p>
           </div>
-          <span class="transaction-value text-success">{{
-            transacao.valor | currency: "BRL"
-          }}</span>
+          <span class="count-pill">{{ contasNaoPagas.length }}</span>
         </div>
-      } @empty {
-        <p class="empty-state">Nenhuma conta paga no período.</p>
-      }
+
+        <div class="transactions-list">
+          @for (transacao of contasNaoPagas; track transacao.id) {
+            <div class="transaction-item">
+              <div class="transaction-info">
+                <span class="status-dot danger"></span>
+                <div>
+                  <strong>{{ transacao.descricao }}</strong>
+                  <small>
+                    {{ transacao.categoriaNome }} ·
+                    {{ transacao.data | date: "dd/MM/yyyy" }}
+                  </small>
+                </div>
+              </div>
+              <strong class="transaction-value negative">
+                {{ transacao.valor | currency: "BRL" }}
+              </strong>
+            </div>
+          } @empty {
+            <div class="empty-state">Nenhuma conta pendente no periodo.</div>
+          }
+        </div>
+      </article>
+
+      <article class="detail-card">
+        <div class="card-header">
+          <div>
+            <h3>Contas pagas</h3>
+            <p>Pagamentos concluidos no periodo.</p>
+          </div>
+          <span class="count-pill success">{{ contasPagas.length }}</span>
+        </div>
+
+        <div class="transactions-list">
+          @for (transacao of contasPagas; track transacao.id) {
+            <div class="transaction-item">
+              <div class="transaction-info">
+                <span class="status-dot success"></span>
+                <div>
+                  <strong>{{ transacao.descricao }}</strong>
+                  <small>
+                    {{ transacao.categoriaNome }} ·
+                    {{ transacao.data | date: "dd/MM/yyyy" }}
+                  </small>
+                </div>
+              </div>
+              <strong class="transaction-value positive">
+                {{ transacao.valor | currency: "BRL" }}
+              </strong>
+            </div>
+          } @empty {
+            <div class="empty-state">Nenhuma conta paga no periodo.</div>
+          }
+        </div>
+      </article>
     </div>
-  </p-card>
-</div>
+  }
+</section>

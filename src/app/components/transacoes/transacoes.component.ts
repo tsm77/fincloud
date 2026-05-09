@@ -112,6 +112,25 @@ export class TransacoesComponent {
     return this.getMesNome(this.mesAtual);
   }
 
+  get totalMes(): number {
+    return this.transacoesFiltradas.reduce(
+      (total, item) => total + Number(item.valor ?? 0),
+      0,
+    );
+  }
+
+  get totalPago(): number {
+    return this.transacoesFiltradas
+      .filter((item) => this.isDespesa(item) && (item as any).pago)
+      .reduce((total, item) => total + Number(item.valor ?? 0), 0);
+  }
+
+  get totalPendente(): number {
+    return this.transacoesFiltradas
+      .filter((item) => this.isDespesa(item) && !(item as any).pago)
+      .reduce((total, item) => total + Number(item.valor ?? 0), 0);
+  }
+
   proximoMes() {
     const nova = new Date(this.dataAtual);
     nova.setMonth(nova.getMonth() + 1);
@@ -400,6 +419,14 @@ export class TransacoesComponent {
     return categoria?.tipo ?? null;
   }
 
+  isReceita(item: Pick<Transacao, 'tipo'>): boolean {
+    return item.tipo === 'RECEITA';
+  }
+
+  isDespesa(item: Pick<Transacao, 'tipo'>): boolean {
+    return item.tipo === 'DESPESA';
+  }
+
   getCorCategoria(nome: string): string {
     const cat = this.categorias().find((c) => c.nome === nome);
     return cat?.cor || '#999';
@@ -414,6 +441,10 @@ export class TransacoesComponent {
   }
 
   confirmarPagamento(event: any, item: any) {
+    if (this.isReceita(item)) {
+      return;
+    }
+
     const valorAnterior = item.pago;
     const novoValor = event.checked;
 
