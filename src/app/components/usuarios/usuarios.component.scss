@@ -1,0 +1,100 @@
+.usuarios-page {
+  width: 100%;
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.subtitle {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.profile-panel {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  padding: 24px;
+}
+
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field input,
+.field .p-input-icon-left {
+  width: 100%;
+}
+
+.field .p-input-icon-left {
+  display: block;
+  position: relative;
+}
+
+.field .p-input-icon-left > i {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  color: #64748b;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+.field input {
+  min-height: 42px;
+  padding-left: 42px;
+}
+
+.error {
+  color: #dc2626;
+  font-size: 12px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.loading-state {
+  display: flex;
+  justify-content: center;
+  padding: 48px 0;
+}
+
+@media (max-width: 768px) {
+  .profile-panel {
+    max-width: 100%;
+    padding: 18px;
+  }
+
+  .actions {
+    flex-direction: column-reverse;
+  }
+}

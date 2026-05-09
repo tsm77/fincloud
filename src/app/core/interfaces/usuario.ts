@@ -4,9 +4,15 @@ export interface Usuario {
   senha: string;
 }
 
+export interface UsuarioUpdate {
+  nome: string;
+  email: string;
+  senha?: string;
+}
+
 export interface UsuarioResponse {
-  id?: string;
+  id?: number;
   nome?: string;
   email?: string;
-  senha?: string;
+  dataCriacao?: string;
 }

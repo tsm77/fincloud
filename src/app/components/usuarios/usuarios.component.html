@@ -1,0 +1,92 @@
+<!-- eslint-disable @angular-eslint/template/elements-content -->
+<p-toast></p-toast>
+
+<div class="usuarios-page">
+  <div class="page-header">
+    <div>
+      <h2 class="title">Meu usuario</h2>
+      <p class="subtitle">Atualize seu nome, email ou senha de acesso.</p>
+    </div>
+  </div>
+
+  <div class="profile-panel">
+    @if (loading()) {
+      <div class="loading-state">
+        <p-progressSpinner ariaLabel="Carregando usuario"></p-progressSpinner>
+      </div>
+    } @else {
+      <form [formGroup]="form" class="profile-form" (ngSubmit)="salvar()">
+        <div class="field">
+          <label for="nome">Nome</label>
+          <span class="p-input-icon-left">
+            <i class="pi pi-user"></i>
+            <input
+              pInputText
+              id="nome"
+              type="text"
+              formControlName="nome"
+              placeholder="Seu nome"
+            />
+          </span>
+          @if (form.controls.nome.touched && form.controls.nome.invalid) {
+            <small class="error">Informe um nome com pelo menos 2 caracteres.</small>
+          }
+        </div>
+
+        <div class="field">
+          <label for="email">Email</label>
+          <span class="p-input-icon-left">
+            <i class="pi pi-inbox"></i>
+            <input
+              pInputText
+              id="email"
+              type="email"
+              formControlName="email"
+              placeholder="seuemail@exemplo.com"
+            />
+          </span>
+          @if (form.controls.email.touched && form.controls.email.invalid) {
+            <small class="error">Informe um email valido.</small>
+          }
+        </div>
+
+        <div class="field">
+          <label for="senha">Nova senha</label>
+          <span class="p-input-icon-left">
+            <i class="pi pi-lock"></i>
+            <input
+              pInputText
+              id="senha"
+              type="password"
+              formControlName="senha"
+              placeholder="Deixe em branco para manter a atual"
+            />
+          </span>
+          @if (form.controls.senha.touched && form.controls.senha.invalid) {
+            <small class="error">A senha deve ter pelo menos 4 caracteres.</small>
+          }
+        </div>
+
+        <div class="actions">
+          <button
+            pButton
+            type="button"
+            label="Voltar"
+            icon="pi pi-arrow-left"
+            class="p-button-outlined"
+            (click)="voltar()"
+          ></button>
+
+          <button
+            pButton
+            type="submit"
+            label="Salvar"
+            icon="pi pi-check"
+            [loading]="saving()"
+            [disabled]="salvarDisabled()"
+          ></button>
+        </div>
+      </form>
+    }
+  </div>
+</div>

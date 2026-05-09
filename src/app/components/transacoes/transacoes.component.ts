@@ -16,7 +16,10 @@ import { finalize } from 'rxjs';
 import { TransacoesService } from '../../core/services/transacoes.service';
 import { CategoriaService } from '../../core/services/categorias.service';
 
-import { Transacao } from '../../core/interfaces/transacoes.model';
+import {
+  Transacao,
+  TransacaoCreateDto,
+} from '../../core/interfaces/transacoes.model';
 
 import { Categoria } from '../../core/interfaces/categorias.model';
 
@@ -241,26 +244,28 @@ export class TransacoesComponent {
     }
 
     // 🔥 calcula total (resolve erro "valor é obrigatório")
-    const total = this.items.controls
-      .map((c) => Number(c.value.valor))
-      .reduce((a, b) => a + b, 0);
+    const itens = this.items.controls.map((control) => {
+      const i = control.getRawValue();
 
-    const dto: any = {
+      return {
+        descricao: i.descricao,
+        valor: this.normalizarValor(i.valor),
+        numeroParcela: i.parcelado ? 1 : undefined,
+        totalParcelas: i.parcelado ? i.numeroParcelas : 1,
+      };
+    });
+
+    const total = this.arredondarCentavos(
+      itens.reduce((acc, item) => acc + item.valor, 0),
+    );
+
+    const dto: TransacaoCreateDto = {
       contaId: v.contaId!,
       categoriaId: v.categoriaId!,
       tipo,
       data: this.formatarData(v.data!),
       valor: total, // 🔥 ESSENCIAL
-      itens: this.items.controls.map((control) => {
-        const i = control.getRawValue();
-
-        return {
-          descricao: i.descricao,
-          valor: Number(i.valor),
-          numeroParcela: i.parcelado ? 1 : undefined,
-          totalParcelas: i.parcelado ? i.numeroParcelas : 1,
-        };
-      }),
+      itens,
     };
 
     this.loading.set(true);
@@ -359,6 +364,34 @@ export class TransacoesComponent {
   // =========================
   formatarData(date: Date): string {
     return date.toISOString().split('T')[0];
+  }
+
+  private normalizarValor(valor: unknown): number {
+    if (typeof valor === 'number') {
+      return this.arredondarCentavos(valor);
+    }
+
+    if (typeof valor === 'string') {
+      const semMoeda = valor.replace(/[^\d,.-]/g, '');
+
+      if (!semMoeda) {
+        return 0;
+      }
+
+      const normalizado = semMoeda.includes(',')
+        ? semMoeda.replace(/\./g, '').replace(',', '.')
+        : semMoeda;
+
+      const numero = Number(normalizado);
+
+      return Number.isFinite(numero) ? this.arredondarCentavos(numero) : 0;
+    }
+
+    return 0;
+  }
+
+  private arredondarCentavos(valor: number): number {
+    return Math.round((valor + Number.EPSILON) * 100) / 100;
   }
 
   getTipoCategoria(): 'RECEITA' | 'DESPESA' | null {

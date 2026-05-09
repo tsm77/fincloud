@@ -19,6 +19,7 @@ export interface TransacaoCreateDto {
   contaId: number;
   categoriaId: number;
   tipo: TipoTransacao;
+  valor: number;
   data: string;
 
   itens: TransacaoItemDto[];

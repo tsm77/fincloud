@@ -1,52 +1,99 @@
 <div class="layout">
-  <!-- SIDEBAR DESKTOP -->
   <aside class="sidebar-desktop">
-    <div class="logo">
-      <img class="brand-logo" src="assets/logo_fincloud.png" alt="FinCloud" />
+    <div class="sidebar-head">
+      <div class="logo">
+        <img class="brand-logo" src="assets/logo_fincloud.png" alt="FinCloud" />
+      </div>
+      <div class="brand-copy">
+        <strong>FinCloud</strong>
+        <span>Painel financeiro</span>
+      </div>
     </div>
 
-    <p-panelMenu [model]="items"></p-panelMenu>
+    <nav class="sidebar-nav" aria-label="Navegacao principal">
+      @for (item of items; track item.route) {
+        <a
+          class="nav-link"
+          [routerLink]="item.route"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          <span class="nav-icon">
+            <i [class]="item.icon"></i>
+          </span>
+          <span>{{ item.label }}</span>
+        </a>
+      }
+    </nav>
 
     <div class="user-section">
-      <div class="user-info">
-        <i class="pi pi-user user-avatar"></i>
-        <div class="user-details">
-          <span class="user-name">{{ userName }}</span>
-        </div>
-      </div>
+      <button type="button" class="user-card" (click)="abrirUsuario()">
+        <span class="user-avatar">{{ userInitials() }}</span>
+        <span class="user-details">
+          <span class="user-label">Minha conta</span>
+          <span class="user-name">{{ userName() }}</span>
+        </span>
+        <i class="pi pi-chevron-right user-arrow"></i>
+      </button>
 
-      <button
-        pButton
-        type="button"
-        (click)="logout()"
-        class="logout-button p-button-text"
-      >
-        <i class="pi pi-sign-out"></i> Sair
+      <button type="button" (click)="logout()" class="logout-button">
+        <i class="pi pi-sign-out"></i>
+        <span>Sair</span>
       </button>
     </div>
   </aside>
 
-  <!-- SIDEBAR MOBILE -->
   <p-sidebar [(visible)]="menuOpen" position="left">
     <div class="mobile-sidebar-content">
-      <p-panelMenu [model]="items"></p-panelMenu>
+      <div class="sidebar-head">
+        <div class="logo">
+          <img class="brand-logo" src="assets/logo_fincloud.png" alt="FinCloud" />
+        </div>
+        <div class="brand-copy">
+          <strong>FinCloud</strong>
+          <span>Painel financeiro</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Navegacao principal">
+        @for (item of items; track item.route) {
+          <a
+            class="nav-link"
+            [routerLink]="item.route"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            (click)="menuOpen = false"
+          >
+            <span class="nav-icon">
+              <i [class]="item.icon"></i>
+            </span>
+            <span>{{ item.label }}</span>
+          </a>
+        }
+      </nav>
 
       <button
-        pButton
         type="button"
-        (click)="logout()"
-        class="p-button-text w-full"
+        class="user-card"
+        (click)="abrirUsuario()"
       >
-        <i class="pi pi-sign-out"></i> Sair
+        <span class="user-avatar">{{ userInitials() }}</span>
+        <span class="user-details">
+          <span class="user-label">Minha conta</span>
+          <span class="user-name">{{ userName() }}</span>
+        </span>
+        <i class="pi pi-chevron-right user-arrow"></i>
+      </button>
+
+      <button type="button" (click)="logout()" class="logout-button">
+        <i class="pi pi-sign-out"></i>
+        <span>Sair</span>
       </button>
     </div>
   </p-sidebar>
 
-  <!-- CONTEÚDO -->
   <div class="content">
-    <!-- TOPBAR -->
     <div class="topbar">
-      <!-- BOTÃO MOBILE -->
       <button
         pButton
         icon="pi pi-bars"
@@ -55,10 +102,9 @@
         class="menu-mobile-btn"
       ></button>
 
-      <h2>Olá, {{ userName }}</h2>
+      <h2>Olá, {{ userName() }}</h2>
     </div>
 
-    <!-- PÁGINA -->
     <div class="page">
       <router-outlet></router-outlet>
     </div>

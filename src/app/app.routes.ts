@@ -7,6 +7,7 @@ import { ContasComponent } from './components/contas/contas.component';
 import { TransacoesComponent } from './components/transacoes/transacoes.component';
 import { CategoriasComponent } from './components/categorias/categorias.component';
 import { ReportsComponent } from './components/reports/reports.component';
+import { UsuariosComponent } from './components/usuarios/usuarios.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -22,6 +23,7 @@ export const routes: Routes = [
       { path: 'transacoes', component: TransacoesComponent },
       { path: 'categorias', component: CategoriasComponent },
       { path: 'relatorios', component: ReportsComponent },
+      { path: 'usuarios', component: UsuariosComponent },
       // { path: 'configuracoes', component: ConfiguracoesComponent },
     ],
   },
