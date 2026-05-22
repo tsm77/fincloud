@@ -123,13 +123,17 @@
                     </strong>
 
                     @if (isDespesa(item)) {
-                      <p-checkbox
-                        [binary]="true"
-                        [ngModel]="item.pago"
-                        (onChange)="confirmarPagamento($event, item)"
-                      ></p-checkbox>
+                      <button
+                        pButton
+                        type="button"
+                        class="payment-btn"
+                        [class.payment-done]="item.pago"
+                        [icon]="item.pago ? 'pi pi-check' : 'pi pi-wallet'"
+                        [label]="item.pago ? 'Pago' : 'Pagar'"
+                        (click)="confirmarPagamento(item)"
+                      ></button>
                     } @else {
-                      <span class="income-badge">Receita</span>
+                      <span class="income-badge">{{ tipoTransacaoLabel(item) }}</span>
                     }
 
                     <div class="row-actions">

@@ -17,6 +17,7 @@ import { TransacoesService } from '../../core/services/transacoes.service';
 import { CategoriaService } from '../../core/services/categorias.service';
 
 import {
+  TipoTransacao,
   Transacao,
   TransacaoCreateDto,
 } from '../../core/interfaces/transacoes.model';
@@ -356,6 +357,10 @@ export class TransacoesComponent {
 
   editar(item: any) {
     this.editandoId = item.id;
+    const totalParcelas = item.totalParcelas || 1;
+    const valorTotal = this.arredondarCentavos(
+      Number(item.valor ?? 0) * totalParcelas,
+    );
 
     this.form.patchValue({
       contaId: item.contaId,
@@ -368,9 +373,9 @@ export class TransacoesComponent {
     this.items.push(
       this.fb.group({
         descricao: (item.descricao || '').replace(/\(\d+\/\d+\)/, '').trim(), // 🔥 FIX
-        valor: item.valor,
-        parcelado: item.totalParcelas > 1,
-        numeroParcelas: item.totalParcelas || 1,
+        valor: valorTotal,
+        parcelado: totalParcelas > 1,
+        numeroParcelas: totalParcelas,
       }),
     );
 
@@ -412,18 +417,24 @@ export class TransacoesComponent {
     return Math.round((valor + Number.EPSILON) * 100) / 100;
   }
 
-  getTipoCategoria(): 'RECEITA' | 'DESPESA' | null {
+  getTipoCategoria(): TipoTransacao | null {
     const categoriaId = this.form.getRawValue().categoriaId;
     const categoria = this.categorias().find((c) => c.id === categoriaId);
     return categoria?.tipo ?? null;
   }
 
   isReceita(item: Pick<Transacao, 'tipo'>): boolean {
-    return item.tipo === 'RECEITA';
+    return item.tipo === 'RECEITA' || item.tipo === 'SALARIO';
   }
 
   isDespesa(item: Pick<Transacao, 'tipo'>): boolean {
     return item.tipo === 'DESPESA';
+  }
+
+  tipoTransacaoLabel(item: Pick<Transacao, 'tipo'>): string {
+    if (item.tipo === 'SALARIO') return 'Salario';
+
+    return item.tipo === 'DESPESA' ? 'Despesa' : 'Receita';
   }
 
   getCorCategoria(nome: string): string {
@@ -439,13 +450,13 @@ export class TransacoesComponent {
     this.msg.add({ severity: 'error', summary: 'Erro', detail });
   }
 
-  confirmarPagamento(event: any, item: any) {
+  confirmarPagamento(item: any) {
     if (this.isReceita(item)) {
       return;
     }
 
     const valorAnterior = item.pago;
-    const novoValor = event.checked;
+    const novoValor = !item.pago;
 
     // volta estado imediato
     item.pago = valorAnterior;

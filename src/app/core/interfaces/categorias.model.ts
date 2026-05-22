@@ -1,4 +1,4 @@
-export type CategoriaTipo = 'RECEITA' | 'DESPESA';
+export type CategoriaTipo = 'RECEITA' | 'DESPESA' | 'SALARIO';
 
 export interface Categoria {
   id: number;

@@ -79,17 +79,12 @@
           </div>
 
           <div class="card-total">
-            <span>{{ isContaInvestimento(c) ? "Total investido" : "Total gasto" }}</span>
+            <span>{{ getTotalLabel(c) }}</span>
             <strong
-              [class.positive]="isContaInvestimento(c)"
-              [class.negative]="!isContaInvestimento(c)"
+              [class.positive]="isTotalPositivo(c)"
+              [class.negative]="!isTotalPositivo(c)"
             >
-              {{
-                (isContaInvestimento(c)
-                  ? getTotalInvestidoConta(c.id)
-                  : getTotalGastoConta(c.id)
-                ) | currency: "BRL"
-              }}
+              {{ getTotalConta(c) | currency: "BRL" }}
             </strong>
           </div>
         </p-card>

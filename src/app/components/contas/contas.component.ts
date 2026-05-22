@@ -29,6 +29,7 @@ function normalizeBackendTipo(tipo: string): BackendTipoConta | null {
   if (t.includes('POUP')) return 'CONTA_POUPANCA';
   if (t.includes('CORRENTE')) return 'CONTA_CORRENTE';
   if (t.includes('INVEST')) return 'INVESTIMENTO';
+  if (t.includes('SALARIO')) return 'SALARIO';
   if (t.includes('CARTEIRA')) return 'CARTEIRA';
   if (t.includes('CAIXA')) return 'CAIXA';
 
@@ -64,6 +65,7 @@ export class ContasComponent implements OnInit {
   readonly contas = signal<Conta[]>([]);
   readonly totaisGastosPorConta = signal<Record<number, number>>({});
   readonly totaisInvestidosPorConta = signal<Record<number, number>>({});
+  readonly totaisSalariosPorConta = signal<Record<number, number>>({});
   menuItemsSelecionado: any[] = [];
   contaSelecionada: any;
   editandoId: number | null = null;
@@ -78,6 +80,7 @@ export class ContasComponent implements OnInit {
     { label: 'Caixa', value: 'Caixa' as TipoConta },
     { label: 'Cartão de Crédito', value: 'Cartão de Crédito' as TipoConta },
     { label: 'Investimento', value: 'Investimento' as TipoConta },
+    { label: 'Salario', value: 'Salario' as TipoConta },
     { label: 'Conta Poupança', value: 'Conta Poupança' as TipoConta },
   ];
 
@@ -165,6 +168,9 @@ export class ContasComponent implements OnInit {
       this.totaisInvestidosPorConta.set(
         this.calcularInvestidosPorConta(transacoes ?? []),
       );
+      this.totaisSalariosPorConta.set(
+        this.calcularSalariosPorConta(transacoes ?? []),
+      );
     } catch (e: any) {
       this.messageService.add({
         severity: 'error',
@@ -216,10 +222,54 @@ export class ContasComponent implements OnInit {
     return this.totaisInvestidosPorConta()[contaId] ?? 0;
   }
 
+  private calcularSalariosPorConta(transacoes: Transacao[]): Record<number, number> {
+    return transacoes.reduce<Record<number, number>>((totais, transacao) => {
+      if (transacao.tipo !== 'SALARIO') {
+        return totais;
+      }
+
+      const valor = Number(transacao.valor ?? 0);
+      const totalAtual = totais[transacao.contaId] ?? 0;
+
+      return {
+        ...totais,
+        [transacao.contaId]: totalAtual + valor,
+      };
+    }, {});
+  }
+
+  getTotalSalarioConta(contaId: number): number {
+    return this.totaisSalariosPorConta()[contaId] ?? 0;
+  }
+
   isContaInvestimento(conta: Conta): boolean {
     const tipo = this.normalizarTipo(conta.tipo);
 
     return tipo.includes('invest') || tipo.includes('poup');
+  }
+
+  isContaSalario(conta: Conta): boolean {
+    return this.normalizarTipo(conta.tipo).includes('salario');
+  }
+
+  getTotalLabel(conta: Conta): string {
+    if (this.isContaSalario(conta)) return 'Total salario';
+    if (this.isContaInvestimento(conta)) return 'Total investido';
+
+    return 'Total gasto';
+  }
+
+  getTotalConta(conta: Conta): number {
+    if (this.isContaSalario(conta)) return this.getTotalSalarioConta(conta.id);
+    if (this.isContaInvestimento(conta)) {
+      return this.getTotalInvestidoConta(conta.id);
+    }
+
+    return this.getTotalGastoConta(conta.id);
+  }
+
+  isTotalPositivo(conta: Conta): boolean {
+    return this.isContaInvestimento(conta) || this.isContaSalario(conta);
   }
 
   /** =========================
@@ -331,6 +381,7 @@ export class ContasComponent implements OnInit {
 
     if (normalizado.includes('credito')) return 'pi pi-credit-card';
     if (normalizado.includes('invest')) return 'pi pi-chart-line';
+    if (normalizado.includes('salario')) return 'pi pi-briefcase';
     if (normalizado.includes('carteira')) return 'pi pi-wallet';
     if (normalizado.includes('poup')) return 'pi pi-money-bill';
     if (normalizado.includes('caixa')) return 'pi pi-box';

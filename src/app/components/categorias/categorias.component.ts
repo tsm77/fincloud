@@ -80,6 +80,10 @@ export class CategoriasComponent {
     () => this.categorias().filter((c) => c.tipo === 'DESPESA').length,
   );
 
+  readonly totalSalarios = computed(
+    () => this.categorias().filter((c) => c.tipo === 'SALARIO').length,
+  );
+
   constructor() {
     // carrega ao entrar
     effect(() => {
@@ -175,11 +179,15 @@ export class CategoriasComponent {
       });
   }
 
-  tipoSeverity(tipo: CategoriaTipo): 'success' | 'danger' {
+  tipoSeverity(tipo: CategoriaTipo): 'success' | 'danger' | 'info' {
+    if (tipo === 'SALARIO') return 'info';
+
     return tipo === 'RECEITA' ? 'success' : 'danger';
   }
 
   tipoLabel(tipo: CategoriaTipo) {
+    if (tipo === 'SALARIO') return 'Salario';
+
     return tipo === 'DESPESA' ? 'Despesa' : 'Receita';
   }
 

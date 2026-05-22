@@ -18,10 +18,10 @@ export class DashboardComponent implements OnInit {
   private contasService = inject(ContaService);
 
   // 🔢 RESUMO
-  saldoTotal = 0;
-  totalReceitas = 0;
-  totalDespesas = 0;
-  totalInvestido = 0;
+  public totalSalarios = 0;
+  public totalReceitas = 0;
+  public totalDespesas = 0;
+  public totalInvestido = 0;
 
   // 📋 LISTA
   ultimasTransacoes: Transacao[] = [];
@@ -113,19 +113,18 @@ export class DashboardComponent implements OnInit {
     transacoes: Transacao[],
     contasGuardadasIds: Set<number>,
   ) {
-    const totalReceitasPeriodo = transacoes
-      .filter((t) => t.tipo === 'RECEITA')
+    this.totalSalarios = transacoes
+      .filter((t) => t.tipo === 'SALARIO')
       .reduce((acc, t) => acc + Number(t.valor), 0);
 
     this.totalReceitas = transacoes
-      .filter((t) => t.tipo === 'RECEITA' && contasGuardadasIds.has(t.contaId))
+      .filter((t) => this.isEntrada(t) && contasGuardadasIds.has(t.contaId))
       .reduce((acc, t) => acc + Number(t.valor), 0);
 
     this.totalDespesas = transacoes
       .filter((t) => t.tipo === 'DESPESA')
       .reduce((acc, t) => acc + Number(t.valor), 0);
 
-    this.saldoTotal = Math.max(totalReceitasPeriodo - this.totalDespesas, 0);
   }
 
   // 💰 INVESTIMENTOS
@@ -138,7 +137,7 @@ export class DashboardComponent implements OnInit {
       .reduce((acc, t) => {
         const valor = Number(t.valor);
 
-        return t.tipo === 'RECEITA' ? acc + valor : acc - valor;
+        return this.isEntrada(t) ? acc + valor : acc - valor;
       }, 0);
 
     this.totalInvestido = Math.max(total, 0);
@@ -177,6 +176,10 @@ export class DashboardComponent implements OnInit {
 
   private isDespesa(transacao: Transacao): boolean {
     return transacao.tipo === 'DESPESA';
+  }
+
+  private isEntrada(transacao: Transacao): boolean {
+    return transacao.tipo === 'RECEITA' || transacao.tipo === 'SALARIO';
   }
 
   private isContaGuardada(conta: ContaResponseDTO): boolean {

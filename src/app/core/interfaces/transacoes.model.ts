@@ -1,4 +1,4 @@
-export type TipoTransacao = 'RECEITA' | 'DESPESA';
+export type TipoTransacao = 'RECEITA' | 'DESPESA' | 'SALARIO';
 
 export interface Transacao {
   id: number;
@@ -13,6 +13,8 @@ export interface Transacao {
   categoriaCor: string;
   dataCriacao: string;
   pago?: boolean; //
+  numeroParcela?: number;
+  totalParcelas?: number;
 }
 
 export interface TransacaoCreateDto {

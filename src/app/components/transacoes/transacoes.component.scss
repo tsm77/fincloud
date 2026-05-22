@@ -198,6 +198,10 @@
   gap: 14px;
 }
 
+.row-actions {
+  gap: 8px;
+}
+
 .transaction-value {
   min-width: 110px;
   color: #dc2626;
@@ -223,6 +227,23 @@
   color: #15803d;
   font-size: 12px;
   font-weight: 800;
+}
+
+.payment-btn {
+  min-width: 92px;
+  height: 34px;
+  border: 1px solid #1e3a8a !important;
+  border-radius: 6px !important;
+  background: #fff !important;
+  color: #1e3a8a !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+}
+
+.payment-btn.payment-done {
+  border-color: #16a34a !important;
+  background: #dcfce7 !important;
+  color: #15803d !important;
 }
 
 .action-btn {

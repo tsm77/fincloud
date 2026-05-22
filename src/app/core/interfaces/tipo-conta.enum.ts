@@ -4,6 +4,7 @@ export type BackendTipoConta =
   | 'CARTAO_CREDITO'
   | 'CONTA_CORRENTE'
   | 'INVESTIMENTO'
+  | 'SALARIO'
   | 'CONTA_POUPANCA';
 
 export type TipoConta =
@@ -12,6 +13,7 @@ export type TipoConta =
   | 'Caixa'
   | 'Cartão de Crédito'
   | 'Investimento'
+  | 'Salario'
   | 'Conta Poupança';
 
 export const BACK_TO_UI: Record<BackendTipoConta, TipoConta> = {
@@ -20,6 +22,7 @@ export const BACK_TO_UI: Record<BackendTipoConta, TipoConta> = {
   CAIXA: 'Caixa',
   CARTAO_CREDITO: 'Cartão de Crédito',
   INVESTIMENTO: 'Investimento',
+  SALARIO: 'Salario',
   CONTA_POUPANCA: 'Conta Poupança',
 };
 
@@ -29,5 +32,6 @@ export const UI_TO_BACK: Record<TipoConta, BackendTipoConta> = {
   Caixa: 'CAIXA',
   'Cartão de Crédito': 'CARTAO_CREDITO',
   Investimento: 'INVESTIMENTO',
+  Salario: 'SALARIO',
   'Conta Poupança': 'CONTA_POUPANCA',
 };

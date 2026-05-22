@@ -10,7 +10,7 @@ interface Transacao {
   id: number;
   descricao: string;
   valor: number;
-  tipo: 'RECEITA' | 'DESPESA';
+  tipo: 'RECEITA' | 'DESPESA' | 'SALARIO';
   data: string | Date;
   contaId: number;
   categoriaNome: string;
@@ -18,7 +18,7 @@ interface Transacao {
 
 interface ResumoCategoria {
   nome: string;
-  tipo: 'RECEITA' | 'DESPESA';
+  tipo: 'RECEITA' | 'DESPESA' | 'SALARIO';
   valor: number;
   percentual: string;
   cor: string;
@@ -133,12 +133,15 @@ export class ReportsComponent implements OnInit {
     contasGuardadasIds: Set<number>,
   ) {
     const movimentacoesRelatorio = transacoes.filter(
-      (t) => t.tipo === 'DESPESA' || contasGuardadasIds.has(t.contaId),
+      (t) =>
+        t.tipo === 'DESPESA' ||
+        t.tipo === 'SALARIO' ||
+        (t.tipo === 'RECEITA' && contasGuardadasIds.has(t.contaId)),
     );
 
     const mapa = new Map<
       string,
-      { nome: string; tipo: 'RECEITA' | 'DESPESA'; valor: number }
+      { nome: string; tipo: 'RECEITA' | 'DESPESA' | 'SALARIO'; valor: number }
     >();
 
     movimentacoesRelatorio.forEach((t) => {
@@ -154,7 +157,7 @@ export class ReportsComponent implements OnInit {
     });
 
     const totalReceitasPeriodo = transacoes
-      .filter((t) => t.tipo === 'RECEITA')
+      .filter((t) => t.tipo === 'RECEITA' || t.tipo === 'SALARIO')
       .reduce((acc, t) => acc + Number(t.valor), 0);
 
     this.totalReceitas = transacoes
@@ -166,19 +169,32 @@ export class ReportsComponent implements OnInit {
       .reduce((acc, t) => acc + Number(t.valor), 0);
 
     this.saldoPeriodo = Math.max(totalReceitasPeriodo - this.totalDespesas, 0);
-    this.totalMovimentado = this.totalReceitas + this.totalDespesas;
+    this.totalMovimentado = movimentacoesRelatorio.reduce(
+      (acc, t) => acc + Number(t.valor),
+      0,
+    );
 
     const coresReceita = ['#16a34a', '#22c55e', '#059669', '#14b8a6'];
     const coresDespesa = ['#dc2626', '#f97316', '#f59e0b', '#8b5cf6'];
+    const coresSalario = ['#1e40af', '#2563eb', '#0ea5e9', '#0891b2'];
     let receitaIndex = 0;
     let despesaIndex = 0;
+    let salarioIndex = 0;
 
     this.resumoCategorias = Array.from(mapa.values())
       .map((categoria) => {
         const cores =
-          categoria.tipo === 'RECEITA' ? coresReceita : coresDespesa;
+          categoria.tipo === 'SALARIO'
+            ? coresSalario
+            : categoria.tipo === 'RECEITA'
+              ? coresReceita
+              : coresDespesa;
         const indice =
-          categoria.tipo === 'RECEITA' ? receitaIndex++ : despesaIndex++;
+          categoria.tipo === 'SALARIO'
+            ? salarioIndex++
+            : categoria.tipo === 'RECEITA'
+              ? receitaIndex++
+              : despesaIndex++;
 
         return {
           ...categoria,
@@ -218,7 +234,9 @@ export class ReportsComponent implements OnInit {
       .toUpperCase();
   }
 
-  tipoLabel(tipo: 'RECEITA' | 'DESPESA'): string {
+  tipoLabel(tipo: 'RECEITA' | 'DESPESA' | 'SALARIO'): string {
+    if (tipo === 'SALARIO') return 'Salario';
+
     return tipo === 'RECEITA' ? 'Guardado' : 'Despesa';
   }
 }

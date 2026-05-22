@@ -38,7 +38,7 @@
 
 .summary-row {
   display: grid;
-  grid-template-columns: 150px 150px 150px minmax(240px, 1fr);
+  grid-template-columns: repeat(4, 150px) minmax(240px, 1fr);
   gap: 14px;
   margin-bottom: 18px;
 }
@@ -77,6 +77,10 @@
 
 .negative {
   color: #dc2626 !important;
+}
+
+.salary {
+  color: #1e3a8a !important;
 }
 
 .search-card {
@@ -273,7 +277,7 @@
 
 .type-options {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
 }
 

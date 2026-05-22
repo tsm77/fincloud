@@ -37,6 +37,11 @@
       <strong class="negative">{{ totalDespesas() }}</strong>
     </div>
 
+    <div class="summary-card">
+      <span>Salarios</span>
+      <strong class="salary">{{ totalSalarios() }}</strong>
+    </div>
+
     <div class="search-card">
       <span class="p-input-icon-left">
         <i class="pi pi-search"></i>
@@ -185,6 +190,19 @@
           <label for="despesa">
             <i class="pi pi-arrow-down-left"></i>
             Despesa
+          </label>
+        </div>
+
+        <div class="type-option" [class.selected]="form.controls.tipo.value === 'SALARIO'">
+          <p-radioButton
+            inputId="salario"
+            name="tipo"
+            value="SALARIO"
+            formControlName="tipo"
+          ></p-radioButton>
+          <label for="salario">
+            <i class="pi pi-briefcase"></i>
+            Salario
           </label>
         </div>
       </div>
