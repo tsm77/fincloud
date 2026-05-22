@@ -19,6 +19,8 @@ import {
   ContaResponseDTO,
 } from '../../core/interfaces/conta.model';
 import { ContaService } from '../../core/services/contas.service';
+import { Transacao } from '../../core/interfaces/transacoes.model';
+import { TransacoesService } from '../../core/services/transacoes.service';
 
 function normalizeBackendTipo(tipo: string): BackendTipoConta | null {
   const t = (tipo ?? '').toUpperCase();
@@ -47,6 +49,7 @@ function normalizeBackendTipo(tipo: string): BackendTipoConta | null {
 export class ContasComponent implements OnInit {
   private fb = inject(NonNullableFormBuilder);
   private contaService = inject(ContaService);
+  private transacoesService = inject(TransacoesService);
   private messageService = inject(MessageService);
 
   /** =========================
@@ -59,6 +62,8 @@ export class ContasComponent implements OnInit {
   readonly saving = signal(false);
 
   readonly contas = signal<Conta[]>([]);
+  readonly totaisGastosPorConta = signal<Record<number, number>>({});
+  readonly totaisInvestidosPorConta = signal<Record<number, number>>({});
   menuItemsSelecionado: any[] = [];
   contaSelecionada: any;
   editandoId: number | null = null;
@@ -97,14 +102,6 @@ export class ContasComponent implements OnInit {
     () => this.contas().filter((c) => !c.arquivada).length,
   );
 
-  readonly saldoTotal = computed(() =>
-    this.contas()
-      .filter((c) => !c.arquivada)
-      .reduce((total, conta) => total + Number(conta.saldo ?? 0), 0),
-  );
-
-  readonly saldoPositivo = computed(() => this.saldoTotal() >= 0);
-
   /** =========================
    *  FORM
    *  ========================= */
@@ -112,7 +109,6 @@ export class ContasComponent implements OnInit {
   readonly form = this.fb.group({
     nome: this.fb.control('', [Validators.required, Validators.minLength(2)]),
     tipo: this.fb.control<TipoConta>('Conta Corrente', [Validators.required]),
-    saldoInicial: this.fb.control<number>(0),
   });
 
   /** =========================
@@ -134,7 +130,7 @@ export class ContasComponent implements OnInit {
       id: dto.id,
       nome: dto.nome,
       tipo: BACK_TO_UI[tipoNormalizado],
-      saldo: Number(dto.saldoInicial ?? dto.saldoInicial ?? 0),
+      saldo: Number(dto.saldo ?? 0),
     };
   }
 
@@ -144,7 +140,6 @@ export class ContasComponent implements OnInit {
     return {
       nome: v.nome,
       tipo: UI_TO_BACK[v.tipo],
-      saldoInicial: Number(v.saldoInicial ?? 0),
     };
   }
 
@@ -156,10 +151,19 @@ export class ContasComponent implements OnInit {
     this.loadingList.set(true);
 
     try {
-      const lista = await firstValueFrom(this.contaService.listar());
+      const [lista, transacoes] = await Promise.all([
+        firstValueFrom(this.contaService.listar()),
+        firstValueFrom(this.transacoesService.listar()),
+      ]);
 
       this.contas.set(
         (lista ?? []).map((dto: ContaResponseDTO) => this.mapFromApi(dto)),
+      );
+      this.totaisGastosPorConta.set(
+        this.calcularGastosPorConta(transacoes ?? []),
+      );
+      this.totaisInvestidosPorConta.set(
+        this.calcularInvestidosPorConta(transacoes ?? []),
       );
     } catch (e: any) {
       this.messageService.add({
@@ -172,6 +176,52 @@ export class ContasComponent implements OnInit {
     }
   }
 
+  private calcularGastosPorConta(transacoes: Transacao[]): Record<number, number> {
+    return transacoes.reduce<Record<number, number>>((totais, transacao) => {
+      if (transacao.tipo !== 'DESPESA') {
+        return totais;
+      }
+
+      const valor = Number(transacao.valor ?? 0);
+      const totalAtual = totais[transacao.contaId] ?? 0;
+
+      return {
+        ...totais,
+        [transacao.contaId]: totalAtual + valor,
+      };
+    }, {});
+  }
+
+  getTotalGastoConta(contaId: number): number {
+    return this.totaisGastosPorConta()[contaId] ?? 0;
+  }
+
+  private calcularInvestidosPorConta(transacoes: Transacao[]): Record<number, number> {
+    return transacoes.reduce<Record<number, number>>((totais, transacao) => {
+      if (transacao.tipo !== 'RECEITA') {
+        return totais;
+      }
+
+      const valor = Number(transacao.valor ?? 0);
+      const totalAtual = totais[transacao.contaId] ?? 0;
+
+      return {
+        ...totais,
+        [transacao.contaId]: totalAtual + valor,
+      };
+    }, {});
+  }
+
+  getTotalInvestidoConta(contaId: number): number {
+    return this.totaisInvestidosPorConta()[contaId] ?? 0;
+  }
+
+  isContaInvestimento(conta: Conta): boolean {
+    const tipo = this.normalizarTipo(conta.tipo);
+
+    return tipo.includes('invest') || tipo.includes('poup');
+  }
+
   /** =========================
    *  UI ACTIONS
    *  ========================= */
@@ -181,7 +231,6 @@ export class ContasComponent implements OnInit {
     this.form.reset({
       nome: '',
       tipo: 'Conta Corrente',
-      saldoInicial: 0,
     });
 
     this.modalNovaConta.set(true);
@@ -206,7 +255,6 @@ export class ContasComponent implements OnInit {
       const payload = this.toPayload();
 
       if (this.editandoId) {
-        // ✏️ EDITAR
         await firstValueFrom(
           this.contaService.editar(this.editandoId, payload),
         );
@@ -217,7 +265,6 @@ export class ContasComponent implements OnInit {
           detail: 'Conta atualizada com sucesso!',
         });
       } else {
-        // 🆕 CRIAR
         await firstValueFrom(this.contaService.criar(payload));
 
         this.messageService.add({
@@ -228,7 +275,7 @@ export class ContasComponent implements OnInit {
       }
 
       this.modalNovaConta.set(false);
-      this.editandoId = null; // 🔥 IMPORTANTE
+      this.editandoId = null;
       await this.carregarContas();
     } catch (e: any) {
       this.messageService.add({
@@ -242,12 +289,11 @@ export class ContasComponent implements OnInit {
   }
 
   editar(conta: Conta) {
-    this.editandoId = conta.id; // 🔥 ESSENCIAL
+    this.editandoId = conta.id;
 
     this.form.reset({
       nome: conta.nome,
       tipo: conta.tipo,
-      saldoInicial: conta.saldo,
     });
 
     this.modalNovaConta.set(true);
@@ -281,10 +327,7 @@ export class ContasComponent implements OnInit {
   }
 
   getContaIcon(tipo: TipoConta): string {
-    const normalizado = tipo
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase();
+    const normalizado = this.normalizarTipo(tipo);
 
     if (normalizado.includes('credito')) return 'pi pi-credit-card';
     if (normalizado.includes('invest')) return 'pi pi-chart-line';
@@ -293,5 +336,12 @@ export class ContasComponent implements OnInit {
     if (normalizado.includes('caixa')) return 'pi pi-box';
 
     return 'pi pi-building-columns';
+  }
+
+  private normalizarTipo(tipo: TipoConta): string {
+    return tipo
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
   }
 }

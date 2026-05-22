@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Component, OnInit, inject } from '@angular/core';
 import { ImportsModule } from '../shared/imports';
 import { firstValueFrom } from 'rxjs';
@@ -65,8 +64,7 @@ export class DashboardComponent implements OnInit {
       const transacoes: Transacao[] = listaTransacoes ?? [];
       const contas = listaContas ?? [];
 
-      this.calcularInvestimentos(contas);
-      this.processarDados(transacoes);
+      this.processarDados(transacoes, contas);
     } catch (e) {
       console.error('Erro ao carregar dashboard', e);
     } finally {
@@ -80,10 +78,16 @@ export class DashboardComponent implements OnInit {
   }
 
   // 🧠 PROCESSAMENTO CENTRAL
-  private processarDados(transacoes: Transacao[]) {
+  private processarDados(transacoes: Transacao[], contas: ContaResponseDTO[]) {
     const filtradas = this.filtrarPorPeriodo(transacoes);
+    const contasGuardadasIds = new Set(
+      contas
+        .filter((conta) => this.isContaGuardada(conta))
+        .map((conta) => conta.id),
+    );
 
-    this.calcularResumo(filtradas);
+    this.calcularResumo(filtradas, contasGuardadasIds);
+    this.calcularInvestimentos(transacoes, contasGuardadasIds);
     this.montarUltimas(transacoes); // mantém geral
     this.montarContas(filtradas);
   }
@@ -105,23 +109,39 @@ export class DashboardComponent implements OnInit {
   }
 
   // 💰 RESUMO
-  private calcularResumo(transacoes: Transacao[]) {
-    this.totalReceitas = transacoes
+  private calcularResumo(
+    transacoes: Transacao[],
+    contasGuardadasIds: Set<number>,
+  ) {
+    const totalReceitasPeriodo = transacoes
       .filter((t) => t.tipo === 'RECEITA')
+      .reduce((acc, t) => acc + Number(t.valor), 0);
+
+    this.totalReceitas = transacoes
+      .filter((t) => t.tipo === 'RECEITA' && contasGuardadasIds.has(t.contaId))
       .reduce((acc, t) => acc + Number(t.valor), 0);
 
     this.totalDespesas = transacoes
       .filter((t) => t.tipo === 'DESPESA')
       .reduce((acc, t) => acc + Number(t.valor), 0);
 
-    this.saldoTotal = this.totalReceitas - this.totalDespesas;
+    this.saldoTotal = Math.max(totalReceitasPeriodo - this.totalDespesas, 0);
   }
 
   // 💰 INVESTIMENTOS
-  private calcularInvestimentos(contas: ContaResponseDTO[]) {
-    this.totalInvestido = contas
-      .filter((conta) => this.isContaInvestimento(conta))
-      .reduce((acc, conta) => acc + this.getSaldoConta(conta), 0);
+  private calcularInvestimentos(
+    transacoes: Transacao[],
+    contasGuardadasIds: Set<number>,
+  ) {
+    const total = transacoes
+      .filter((t) => contasGuardadasIds.has(t.contaId))
+      .reduce((acc, t) => {
+        const valor = Number(t.valor);
+
+        return t.tipo === 'RECEITA' ? acc + valor : acc - valor;
+      }, 0);
+
+    this.totalInvestido = Math.max(total, 0);
   }
 
   // 📋 ÚLTIMAS TRANSAÇÕES
@@ -152,18 +172,17 @@ export class DashboardComponent implements OnInit {
       (acc, t) => acc + Number(t.valor),
       0,
     );
+
   }
 
   private isDespesa(transacao: Transacao): boolean {
     return transacao.tipo === 'DESPESA';
   }
 
-  private isContaInvestimento(conta: ContaResponseDTO): boolean {
-    return this.normalizarTexto(conta.tipo).includes('INVEST');
-  }
+  private isContaGuardada(conta: ContaResponseDTO): boolean {
+    const tipo = this.normalizarTexto(conta.tipo);
 
-  private getSaldoConta(conta: ContaResponseDTO): number {
-    return Number(conta.saldo ?? conta.saldoInicial ?? 0);
+    return tipo.includes('INVEST') || tipo.includes('POUP');
   }
 
   private normalizarTexto(valor: unknown): string {

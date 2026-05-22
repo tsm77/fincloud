@@ -4,7 +4,6 @@ export interface ContaResponseDTO {
   id: number;
   nome: string;
   tipo: BackendTipoConta | string;
-  saldoInicial?: number | null;
   saldo?: number | null;
   ativa?: boolean | null;
 }
@@ -12,7 +11,6 @@ export interface ContaResponseDTO {
 export interface ContaCreateDTO {
   nome: string;
   tipo: BackendTipoConta;
-  saldoInicial: number;
 }
 
 export interface Conta {
@@ -26,5 +24,4 @@ export interface Conta {
 export interface ContaUpdateDTO {
   nome: string;
   tipo: BackendTipoConta;
-  saldoInicial: number;
 }

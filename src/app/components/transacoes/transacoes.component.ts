@@ -113,10 +113,9 @@ export class TransacoesComponent {
   }
 
   get totalMes(): number {
-    return this.transacoesFiltradas.reduce(
-      (total, item) => total + Number(item.valor ?? 0),
-      0,
-    );
+    return this.transacoesFiltradas
+      .filter((item) => this.isDespesa(item))
+      .reduce((total, item) => total + Number(item.valor ?? 0), 0);
   }
 
   get totalPago(): number {

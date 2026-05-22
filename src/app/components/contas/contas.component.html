@@ -1,4 +1,3 @@
-<!-- eslint-disable @angular-eslint/template/label-has-associated-control -->
 <!-- eslint-disable @angular-eslint/template/elements-content -->
 <p-toast></p-toast>
 
@@ -7,7 +6,7 @@
     <div class="title-block">
       <span class="eyebrow">Carteira</span>
       <h2>Contas</h2>
-      <p>Gerencie suas contas financeiras e acompanhe seus saldos.</p>
+      <p>Gerencie suas contas financeiras.</p>
     </div>
 
     <button
@@ -21,16 +20,6 @@
   </header>
 
   <div class="summary-row">
-    <div class="summary-card balance-card">
-      <span class="summary-label">Saldo total</span>
-      <strong
-        class="summary-value"
-        [class.negative]="!saldoPositivo()"
-      >
-        {{ saldoTotal() | currency: "BRL" }}
-      </strong>
-    </div>
-
     <div class="summary-card">
       <span class="summary-label">Contas ativas</span>
       <strong class="summary-value">{{ contasAtivasTotal() }}</strong>
@@ -89,13 +78,18 @@
             ></button>
           </div>
 
-          <div class="card-balance">
-            <span>Saldo atual</span>
+          <div class="card-total">
+            <span>{{ isContaInvestimento(c) ? "Total investido" : "Total gasto" }}</span>
             <strong
-              [class.positive]="c.saldo >= 0"
-              [class.negative]="c.saldo < 0"
+              [class.positive]="isContaInvestimento(c)"
+              [class.negative]="!isContaInvestimento(c)"
             >
-              {{ c.saldo | currency: "BRL" }}
+              {{
+                (isContaInvestimento(c)
+                  ? getTotalInvestidoConta(c.id)
+                  : getTotalGastoConta(c.id)
+                ) | currency: "BRL"
+              }}
             </strong>
           </div>
         </p-card>
@@ -162,17 +156,6 @@
         formControlName="tipo"
         appendTo="body"
       ></p-dropdown>
-    </div>
-
-    <div class="field">
-      <label for="saldoInicial">Saldo inicial</label>
-      <p-inputNumber
-        inputId="saldoInicial"
-        formControlName="saldoInicial"
-        mode="currency"
-        currency="BRL"
-        locale="pt-BR"
-      ></p-inputNumber>
     </div>
 
     <div class="dialog-actions">

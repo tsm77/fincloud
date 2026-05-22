@@ -3,6 +3,8 @@ import { Component, OnInit, inject } from '@angular/core';
 import { ImportsModule } from '../shared/imports';
 import { firstValueFrom } from 'rxjs';
 import { TransacoesService } from '../../core/services/transacoes.service';
+import { ContaResponseDTO } from '../../core/interfaces/conta.model';
+import { ContaService } from '../../core/services/contas.service';
 
 interface Transacao {
   id: number;
@@ -10,6 +12,7 @@ interface Transacao {
   valor: number;
   tipo: 'RECEITA' | 'DESPESA';
   data: string | Date;
+  contaId: number;
   categoriaNome: string;
 }
 
@@ -30,6 +33,7 @@ interface ResumoCategoria {
 })
 export class ReportsComponent implements OnInit {
   private service = inject(TransacoesService);
+  private contasService = inject(ContaService);
 
   // 📊 GRÁFICO
   graficoCategorias: any;
@@ -76,10 +80,13 @@ export class ReportsComponent implements OnInit {
     this.loading = true;
 
     try {
-      const lista = await firstValueFrom(this.service.listar());
+      const [lista, contas] = await Promise.all([
+        firstValueFrom(this.service.listar()),
+        firstValueFrom(this.contasService.listar()),
+      ]);
       const transacoes: Transacao[] = lista ?? [];
 
-      this.processarDados(transacoes);
+      this.processarDados(transacoes, contas ?? []);
     } catch (e) {
       console.error('Erro ao carregar relatórios', e);
     } finally {
@@ -93,10 +100,15 @@ export class ReportsComponent implements OnInit {
   }
 
   // 🧠 PROCESSAMENTO CENTRAL
-  private processarDados(transacoes: Transacao[]) {
+  private processarDados(transacoes: Transacao[], contas: ContaResponseDTO[]) {
     const filtradas = this.filtrarPorPeriodo(transacoes);
+    const contasGuardadasIds = new Set(
+      contas
+        .filter((conta) => this.isContaGuardada(conta))
+        .map((conta) => conta.id),
+    );
 
-    this.montarGrafico(filtradas);
+    this.montarGrafico(filtradas, contasGuardadasIds);
   }
 
   // 📅 FILTRO POR DATA
@@ -116,13 +128,20 @@ export class ReportsComponent implements OnInit {
   }
 
   // 📊 GRÁFICO + RESUMO
-  private montarGrafico(transacoes: Transacao[]) {
+  private montarGrafico(
+    transacoes: Transacao[],
+    contasGuardadasIds: Set<number>,
+  ) {
+    const movimentacoesRelatorio = transacoes.filter(
+      (t) => t.tipo === 'DESPESA' || contasGuardadasIds.has(t.contaId),
+    );
+
     const mapa = new Map<
       string,
       { nome: string; tipo: 'RECEITA' | 'DESPESA'; valor: number }
     >();
 
-    transacoes.forEach((t) => {
+    movimentacoesRelatorio.forEach((t) => {
       const chave = `${t.tipo}-${t.categoriaNome}`;
       const atual = mapa.get(chave) ?? {
         nome: t.categoriaNome,
@@ -134,15 +153,19 @@ export class ReportsComponent implements OnInit {
       mapa.set(chave, atual);
     });
 
-    this.totalReceitas = transacoes
+    const totalReceitasPeriodo = transacoes
       .filter((t) => t.tipo === 'RECEITA')
+      .reduce((acc, t) => acc + Number(t.valor), 0);
+
+    this.totalReceitas = transacoes
+      .filter((t) => t.tipo === 'RECEITA' && contasGuardadasIds.has(t.contaId))
       .reduce((acc, t) => acc + Number(t.valor), 0);
 
     this.totalDespesas = transacoes
       .filter((t) => t.tipo === 'DESPESA')
       .reduce((acc, t) => acc + Number(t.valor), 0);
 
-    this.saldoPeriodo = this.totalReceitas - this.totalDespesas;
+    this.saldoPeriodo = Math.max(totalReceitasPeriodo - this.totalDespesas, 0);
     this.totalMovimentado = this.totalReceitas + this.totalDespesas;
 
     const coresReceita = ['#16a34a', '#22c55e', '#059669', '#14b8a6'];
@@ -182,7 +205,20 @@ export class ReportsComponent implements OnInit {
     };
   }
 
+  private isContaGuardada(conta: ContaResponseDTO): boolean {
+    const tipo = this.normalizarTexto(conta.tipo);
+
+    return tipo.includes('INVEST') || tipo.includes('POUP');
+  }
+
+  private normalizarTexto(valor: unknown): string {
+    return String(valor ?? '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toUpperCase();
+  }
+
   tipoLabel(tipo: 'RECEITA' | 'DESPESA'): string {
-    return tipo === 'RECEITA' ? 'Receita' : 'Despesa';
+    return tipo === 'RECEITA' ? 'Guardado' : 'Despesa';
   }
 }

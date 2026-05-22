@@ -230,9 +230,21 @@
   color: #16a34a;
 }
 
-.transactions-list {
-  display: flex;
-  flex-direction: column;
+:host ::ng-deep .transactions-table {
+  .p-datatable-tbody > tr > td {
+    padding: 0;
+    border-color: #f1f5f9;
+  }
+
+  .p-datatable-tbody > tr:first-child > td {
+    border-top: 0;
+  }
+
+  .p-paginator {
+    justify-content: flex-end;
+    padding: 10px 12px;
+    border-top: 1px solid #eef2f7;
+  }
 }
 
 .transaction-item {

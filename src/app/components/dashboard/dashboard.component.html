@@ -58,7 +58,7 @@
         </span>
         <div>
           <span class="metric-label">Saldo do periodo</span>
-          <strong [class.negative]="saldoTotal < 0">
+          <strong>
             {{ saldoTotal | currency: "BRL" }}
           </strong>
         </div>
@@ -69,8 +69,10 @@
           <i class="pi pi-arrow-up-right"></i>
         </span>
         <div>
-          <span class="metric-label">Receitas</span>
-          <strong class="positive">{{ totalReceitas | currency: "BRL" }}</strong>
+          <span class="metric-label">Guardado no mes</span>
+          <strong class="positive">{{
+            totalReceitas | currency: "BRL"
+          }}</strong>
         </div>
       </article>
 
@@ -80,7 +82,9 @@
         </span>
         <div>
           <span class="metric-label">Despesas</span>
-          <strong class="negative">{{ totalDespesas | currency: "BRL" }}</strong>
+          <strong class="negative">{{
+            totalDespesas | currency: "BRL"
+          }}</strong>
         </div>
       </article>
 
@@ -89,7 +93,7 @@
           <i class="pi pi-chart-line"></i>
         </span>
         <div>
-          <span class="metric-label">Investimentos</span>
+          <span class="metric-label">Total guardado</span>
           <strong>{{ totalInvestido | currency: "BRL" }}</strong>
         </div>
       </article>
@@ -127,27 +131,43 @@
           <span class="count-pill">{{ contasNaoPagas.length }}</span>
         </div>
 
-        <div class="transactions-list">
-          @for (transacao of contasNaoPagas; track transacao.id) {
-            <div class="transaction-item">
-              <div class="transaction-info">
-                <span class="status-dot danger"></span>
-                <div>
-                  <strong>{{ transacao.descricao }}</strong>
-                  <small>
-                    {{ transacao.categoriaNome }} ·
-                    {{ transacao.data | date: "dd/MM/yyyy" }}
-                  </small>
+        <p-table
+          [value]="contasNaoPagas"
+          [paginator]="contasNaoPagas.length > 5"
+          [rows]="5"
+          [rowsPerPageOptions]="[5, 10, 20]"
+          styleClass="transactions-table"
+        >
+          <ng-template #body let-transacao>
+            <tr>
+              <td>
+                <div class="transaction-item">
+                  <div class="transaction-info">
+                    <span class="status-dot danger"></span>
+                    <div>
+                      <strong>{{ transacao.descricao }}</strong>
+                      <small>
+                        {{ transacao.categoriaNome }} -
+                        {{ transacao.data | date: "dd/MM/yyyy" }}
+                      </small>
+                    </div>
+                  </div>
+                  <strong class="transaction-value negative">
+                    {{ transacao.valor | currency: "BRL" }}
+                  </strong>
                 </div>
-              </div>
-              <strong class="transaction-value negative">
-                {{ transacao.valor | currency: "BRL" }}
-              </strong>
-            </div>
-          } @empty {
-            <div class="empty-state">Nenhuma conta pendente no periodo.</div>
-          }
-        </div>
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template #emptymessage>
+            <tr>
+              <td>
+                <div class="empty-state">Nenhuma conta pendente no periodo.</div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
       </article>
 
       <article class="detail-card">
@@ -159,27 +179,43 @@
           <span class="count-pill success">{{ contasPagas.length }}</span>
         </div>
 
-        <div class="transactions-list">
-          @for (transacao of contasPagas; track transacao.id) {
-            <div class="transaction-item">
-              <div class="transaction-info">
-                <span class="status-dot success"></span>
-                <div>
-                  <strong>{{ transacao.descricao }}</strong>
-                  <small>
-                    {{ transacao.categoriaNome }} ·
-                    {{ transacao.data | date: "dd/MM/yyyy" }}
-                  </small>
+        <p-table
+          [value]="contasPagas"
+          [paginator]="contasPagas.length > 5"
+          [rows]="5"
+          [rowsPerPageOptions]="[5, 10, 20]"
+          styleClass="transactions-table"
+        >
+          <ng-template #body let-transacao>
+            <tr>
+              <td>
+                <div class="transaction-item">
+                  <div class="transaction-info">
+                    <span class="status-dot success"></span>
+                    <div>
+                      <strong>{{ transacao.descricao }}</strong>
+                      <small>
+                        {{ transacao.categoriaNome }} -
+                        {{ transacao.data | date: "dd/MM/yyyy" }}
+                      </small>
+                    </div>
+                  </div>
+                  <strong class="transaction-value positive">
+                    {{ transacao.valor | currency: "BRL" }}
+                  </strong>
                 </div>
-              </div>
-              <strong class="transaction-value positive">
-                {{ transacao.valor | currency: "BRL" }}
-              </strong>
-            </div>
-          } @empty {
-            <div class="empty-state">Nenhuma conta paga no periodo.</div>
-          }
-        </div>
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template #emptymessage>
+            <tr>
+              <td>
+                <div class="empty-state">Nenhuma conta paga no periodo.</div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
       </article>
     </div>
   }

@@ -43,7 +43,7 @@
 
 .summary-row {
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) 180px minmax(260px, 360px);
+  grid-template-columns: 180px minmax(260px, 360px);
   gap: 14px;
   margin-bottom: 22px;
 }
@@ -73,10 +73,6 @@
 .summary-value {
   color: #0f172a;
   font-size: 24px;
-}
-
-.summary-value.negative {
-  color: #dc2626;
 }
 
 .search-card {
@@ -191,23 +187,15 @@
   border: 1px solid #e5e7eb !important;
 }
 
-.card-balance {
+.card-total {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding-top: 18px;
-  margin-top: 18px;
+  padding-top: 16px;
+  margin-top: 16px;
   border-top: 1px solid #eef2f7;
 
   span {
     color: #64748b;
-    font-size: 13px;
-  }
-
-  strong {
-    color: #0f172a;
-    font-size: 25px;
-    font-weight: 850;
   }
 
   .positive {
@@ -316,8 +304,7 @@
 
 :host ::ng-deep .account-form {
   .p-dropdown,
-  .p-inputnumber,
-  .p-inputnumber-input {
+  .p-inputtext {
     width: 100%;
   }
 
