@@ -184,7 +184,7 @@ export class ContasComponent implements OnInit {
 
   private calcularGastosPorConta(transacoes: Transacao[]): Record<number, number> {
     return transacoes.reduce<Record<number, number>>((totais, transacao) => {
-      if (transacao.tipo !== 'DESPESA') {
+      if (transacao.tipo !== 'DESPESA' || transacao.pago) {
         return totais;
       }
 
